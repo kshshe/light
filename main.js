@@ -65,8 +65,12 @@ const initEverything = () => {
   const addEvent = (events, callback) => {
     events.forEach(event => {
       window.addEventListener(event, (e) => {
-        const x = e.clientX ?? e.touches[0].clientX;
-        const y = window.innerHeight - (e.clientY ?? e.touches[0].clientY);
+        const x = e.clientX ?? e.touches?.[0]?.clientX;
+        const y = window.innerHeight - (e.clientY ?? e.touches?.[0]?.clientY);
+
+        if (x === undefined || y === undefined) {
+          return;
+        }
 
         callback(x, y, e);
       });
