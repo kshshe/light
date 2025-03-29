@@ -203,7 +203,7 @@ const initEverything = () => {
       {
         startX: options.x,
         startY: window.innerHeight - options.y,
-        endX: options.x + options.width,
+        endX: options.x + options.width - options.width / 2,
         endY: window.innerHeight - options.y,
       }
     ]
