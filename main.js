@@ -112,7 +112,7 @@ const initEverything = () => {
   }
 
   const autoMovingSource = {
-    isVisible: true,
+    isVisible: false,
     position: {
       x: 100,
       y: 100,
@@ -121,8 +121,12 @@ const initEverything = () => {
   }
 
   setInterval(() => {
-    autoMovingSource.position.x = 200 + 100 * Math.cos(Date.now() / 1000);
-    autoMovingSource.position.y = window.innerHeight - (200 + 100 * Math.sin(Date.now() / 1000));
+    const leftX = window.innerWidth / 2;
+    const topY = window.innerHeight / 2;
+
+    autoMovingSource.position.x = leftX + 100 * Math.cos(Date.now() / 1000);
+    autoMovingSource.position.y = topY + 100 * Math.sin(Date.now() / 1000);
+    autoMovingSource.isVisible = true;
   }, 10);
 
   const addEvent = (events, callback) => {
@@ -211,8 +215,8 @@ const initEverything = () => {
 
   const obstacles = [
     ...getSquare({
-      x: 150,
-      y: 150,
+      x: window.innerWidth / 2 - 50,
+      y: window.innerHeight / 2 - 50,
       width: 100,
       height: 100,
     }),
