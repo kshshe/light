@@ -57,17 +57,24 @@ const initEverything = () => {
     autoMovingSource.position.y = window.innerHeight - (200 + 100 * Math.sin(Date.now() / 1000));
   }, 10);
 
-  window.addEventListener('mousemove', (e) => {
+  const addEvent = (events, callback) => {
+    events.forEach(event => {
+      window.addEventListener(event, (e) => {
+        const x = e.clientX;
+        const y = window.innerHeight - e.clientY;
+
+        callback(x, y, e);
+      });
+    });
+  }
+
+  addEvent(['mousemove', 'click', 'touchstart'], (x, y, e) => {
     lightSource.isVisible = true;
-    lightSource.position.x = e.clientX;
-    lightSource.position.y = window.innerHeight - e.clientY;
+    lightSource.position.x = x;
+    lightSource.position.y = y;
   });
 
-  window.addEventListener('mouseleave', () => {
-    lightSource.isVisible = false;
-  });
-
-  window.addEventListener('mouseout', () => {
+  addEvent(['mouseleave', 'mouseout'], () => {
     lightSource.isVisible = false;
   });
 
