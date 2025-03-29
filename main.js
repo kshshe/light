@@ -1,7 +1,12 @@
 const MAX_SOURCES = 10;
 
 const initEverything = () => {
-  const gpu = new GPU.GPU();
+  const GpuConstructor = GPU.GPU ?? GPU;
+  if (!GpuConstructor) {
+    throw new Error('GPU.js is not loaded properly');
+  }
+
+  const gpu = new GpuConstructor();
   const render = gpu.createKernel(function (sources) {
     const x = this.thread.x;
     const y = this.thread.y;
