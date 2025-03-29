@@ -65,15 +65,15 @@ const initEverything = () => {
   const addEvent = (events, callback) => {
     events.forEach(event => {
       window.addEventListener(event, (e) => {
-        const x = e.clientX;
-        const y = window.innerHeight - e.clientY;
+        const x = e.clientX ?? e.touches[0].clientX;
+        const y = window.innerHeight - (e.clientY ?? e.touches[0].clientY);
 
         callback(x, y, e);
       });
     });
   }
 
-  addEvent(['mousemove', 'click', 'touchstart'], (x, y, e) => {
+  addEvent(['mousemove', 'click', 'touchstart'], (x, y) => {
     lightSource.isVisible = true;
     lightSource.position.x = x;
     lightSource.position.y = y;
