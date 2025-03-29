@@ -73,13 +73,13 @@ const initEverything = () => {
     });
   }
 
-  addEvent(['mousemove', 'click', 'touchstart'], (x, y) => {
+  addEvent(['mousemove', 'click', 'touchstart', 'touchmove'], (x, y) => {
     lightSource.isVisible = true;
     lightSource.position.x = x;
     lightSource.position.y = y;
   });
 
-  addEvent(['mouseleave', 'mouseout'], () => {
+  addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
     lightSource.isVisible = false;
   });
 
