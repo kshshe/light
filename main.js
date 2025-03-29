@@ -157,7 +157,7 @@ const initEverything = () => {
     sources.push(newLightSource);
   })
 
-  addEvent(['mousemove', 'touchstart', 'touchmove'], (x, y) => {
+  addEvent(['mousemove', 'touchmove'], (x, y) => {
     lightSource.isVisible = true;
     lightSource.position.x = x;
     lightSource.position.y = y;
