@@ -1,4 +1,5 @@
 const MAX_SOURCES = 10;
+const MAX_OBSTACLES = 10;
 
 const initEverything = () => {
   const GpuConstructor = GPU.GPU ?? GPU;
@@ -6,8 +7,30 @@ const initEverything = () => {
     throw new Error('GPU.js is not loaded properly');
   }
 
+  function ccw(aX, aY, bX, bY, cX, cY) {
+    if ((cY - aY) * (bX - aX) > (bY - aY) * (cX - aX)) {
+      return 1;
+    }
+
+    return 0;
+  }
+
+  function intersect(aX, aY, bX, bY, cX, cY, dX, dY) {
+    const ACDResult = ccw(aX, aY, cX, cY, dX, dY);
+    const BCDResult = ccw(bX, bY, cX, cY, dX, dY);
+    const ABCResult = ccw(aX, aY, bX, bY, cX, cY);
+    const ABDResult = ccw(aX, aY, bX, bY, dX, dY);
+
+    if (ACDResult !== BCDResult) {
+      if (ABCResult !== ABDResult) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
   const gpu = new GpuConstructor();
-  const render = gpu.createKernel(function (sources) {
+  const render = gpu.createKernel(function (sources, obstacles) {
     const x = this.thread.x;
     const y = this.thread.y;
 
@@ -22,7 +45,24 @@ const initEverything = () => {
       if (sourceIntensity > 0) {
         const distance = Math.sqrt((x - sourceX) ** 2 + (y - sourceY) ** 2);
         const intensity = sourceIntensity / distance;
-        sumOfIntensities += intensity;
+
+        let hasObstacleInPath = false;
+        for (let j = 0; j < this.constants.obstaclesCount; j++) {
+          const obstacleStartX = obstacles[j * 4];
+          const obstacleStartY = obstacles[j * 4 + 1];
+          const obstacleEndX = obstacles[j * 4 + 2];
+          const obstacleEndY = obstacles[j * 4 + 3];
+
+          if (obstacleEndX !== obstacleStartX || obstacleEndY !== obstacleStartY) {
+            if (intersect(sourceX, sourceY, x, y, obstacleStartX, obstacleStartY, obstacleEndX, obstacleEndY) === 0) {
+              hasObstacleInPath = true;
+            }
+          }
+        }
+
+        if (!hasObstacleInPath) {
+          sumOfIntensities += intensity;
+        }
       }
     }
 
@@ -30,11 +70,34 @@ const initEverything = () => {
   }, {
     constants: {
       sourcesCount: MAX_SOURCES,
+      obstaclesCount: MAX_OBSTACLES,
     }
   })
     .setDynamicArguments(true)
     .setOutput([window.innerWidth, window.innerHeight])
-    .setGraphical(true);
+    .setGraphical(true)
+    .addFunction(ccw, {
+      argumentTypes: {
+        aX: 'Number',
+        aY: 'Number',
+        bX: 'Number',
+        bY: 'Number',
+        cX: 'Number',
+        cY: 'Number',
+      }, returnType: 'Number'
+    })
+    .addFunction(intersect, {
+      argumentTypes: {
+        aX: 'Number',
+        aY: 'Number',
+        bX: 'Number',
+        bY: 'Number',
+        cX: 'Number',
+        cY: 'Number',
+        dX: 'Number',
+        dY: 'Number',
+      }, returnType: 'Number'
+    });
 
   const canvas = render.canvas;
   document.getElementsByTagName('body')[0].appendChild(canvas);
@@ -97,12 +160,72 @@ const initEverything = () => {
     return flattenedSources;
   }
 
+  function flattenObstacles(obstacles) {
+    const flattenedObstacles = obstacles.flatMap(obstacle => [
+      obstacle.startX,
+      obstacle.startY,
+      obstacle.endX,
+      obstacle.endY,
+    ]);
+
+    if (flattenedObstacles.length < MAX_OBSTACLES * 4) {
+      flattenedObstacles.push(...Array(MAX_OBSTACLES * 4 - flattenedObstacles.length).fill(0));
+    }
+
+    return flattenedObstacles;
+  }
+
+  function getSquare(options) {
+    return [
+      // Square
+      // left side
+      {
+        startX: options.x,
+        startY: window.innerHeight - options.y,
+        endX: options.x,
+        endY: window.innerHeight - (options.y + options.height),
+      },
+      // right side
+      {
+        startX: options.x + options.width,
+        startY: window.innerHeight - options.y,
+        endX: options.x + options.width,
+        endY: window.innerHeight - (options.y + options.height),
+      },
+      // bottom side
+      {
+        startX: options.x,
+        startY: window.innerHeight - (options.y + options.height),
+        endX: options.x + options.width,
+        endY: window.innerHeight - (options.y + options.height),
+      },
+      // top side
+      {
+        startX: options.x,
+        startY: window.innerHeight - options.y,
+        endX: options.x + options.width,
+        endY: window.innerHeight - options.y,
+      }
+    ]
+  }
+
+  const obstacles = [
+    ...getSquare({
+      x: 150,
+      y: 150,
+      width: 100,
+      height: 100,
+    }),
+  ]
+
   function processFrame() {
     const sources = [lightSource, autoMovingSource];
     const filteredSources = sources.filter(source => source.isVisible);
 
     const input = flattenSources(filteredSources);
-    render(input);
+    const obstaclesInput = flattenObstacles(obstacles);
+
+    render(input, obstaclesInput);
 
     requestAnimationFrame(processFrame);
   }
