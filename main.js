@@ -97,9 +97,6 @@ const initEverything = () => {
     return flattenedSources;
   }
 
-  window.lightSource = lightSource;
-  window.autoMovingSource = autoMovingSource;
-
   function processFrame() {
     const sources = [lightSource, autoMovingSource];
     const filteredSources = sources.filter(source => source.isVisible);
