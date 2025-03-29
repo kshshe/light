@@ -66,14 +66,13 @@ const initEverything = () => {
       }
     }
 
-    this.color(sumOfIntensities, sumOfIntensities, sumOfIntensities, 1);
+    this.color(sumOfIntensities, sumOfIntensities, sumOfIntensities);
   }, {
     constants: {
       sourcesCount: MAX_SOURCES,
       obstaclesCount: MAX_OBSTACLES,
     }
   })
-    .setDynamicArguments(true)
     .setOutput([window.innerWidth, window.innerHeight])
     .setGraphical(true)
     .addFunction(ccw, {
@@ -119,6 +118,7 @@ const initEverything = () => {
     },
     intensity: 10,
   }
+  const sources = [lightSource, autoMovingSource];
 
   setInterval(() => {
     const leftX = window.innerWidth / 2;
@@ -139,8 +139,25 @@ const initEverything = () => {
       });
     });
   }
+  
+  addEvent(['click'], (x, y) => {
+    if (sources.length >= MAX_SOURCES) {
+      return;
+    }
 
-  addEvent(['mousemove', 'click', 'touchstart', 'touchmove'], (x, y) => {
+    const newLightSource = {
+      isVisible: true,
+      position: {
+        x,
+        y,
+      },
+      intensity: 10,
+    }
+
+    sources.push(newLightSource);
+  })
+
+  addEvent(['mousemove', 'touchstart', 'touchmove'], (x, y) => {
     lightSource.isVisible = true;
     lightSource.position.x = x;
     lightSource.position.y = y;
@@ -223,7 +240,6 @@ const initEverything = () => {
   ]
 
   function processFrame() {
-    const sources = [lightSource, autoMovingSource];
     const filteredSources = sources.filter(source => source.isVisible);
 
     const input = flattenSources(filteredSources);
