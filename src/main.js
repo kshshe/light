@@ -4,6 +4,7 @@ import { initializeEvents } from './events.js'
 import { flattenSources } from './utils/flattenSources.js'
 import { flattenObstacles } from './utils/flattenObstacles.js'
 import { getSquare } from './utils/getSquare.js'
+import { getCircle } from "./utils/getCircle.js"
 
 inject()
 
@@ -135,13 +136,15 @@ const initEverything = () => {
   const sources = [lightSource];
 
   const obstacles = [
-    ...getSquare({
+    ...getCircle({
       x: window.innerWidth / 2 - 50,
       y: window.innerHeight / 2 - 50,
       width: 100,
       height: 100,
     }),
   ]
+
+  console.log(obstacles);
 
   function processFrame() {
     const filteredSources = sources.filter(source => source.isVisible);

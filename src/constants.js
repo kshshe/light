@@ -1,5 +1,5 @@
 export const MAX_SOURCES = 10;
-export const MAX_OBSTACLES = 10;
+export const MAX_OBSTACLES = 6;
 
 export const PRETTY_COLORS = [
   { r: 0.95, g: 0.80, b: 0.81 }, // Pastel Pink
