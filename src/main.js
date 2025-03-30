@@ -152,7 +152,22 @@ const initEverything = () => {
         ...lightSource.position,
       }
     }
+    
+    if (lightSource.color.r !== 1) {
+      const diff = 1 - lightSource.color.r;
+      lightSource.color.r += diff / 50;
+    }
 
+    if (lightSource.color.g !== 1) {
+      const diff = 1 - lightSource.color.g;
+      lightSource.color.g += diff / 50;
+    }
+
+    if (lightSource.color.b !== 1) {
+      const diff = 1 - lightSource.color.b;
+      lightSource.color.b += diff / 50;
+    }
+    
     lightSource.targetPosition.x = leftX + 100 * Math.cos(Date.now() / 1000);
     lightSource.targetPosition.y = topY + 100 * Math.sin(Date.now() / 1000);
     lightSource.isVisible = true;
@@ -185,6 +200,19 @@ const initEverything = () => {
     lightSource.intensity = Math.max(0.1, lightSource.intensity);
     lightSource.intensity = Math.min(100, lightSource.intensity);
   })
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'c') {
+      lightSource.color.r = Math.random();
+      lightSource.color.g = Math.random();
+      lightSource.color.b = Math.random();
+      const sum = lightSource.color.r + lightSource.color.g + lightSource.color.b;
+      const increase = 3 / sum;
+      lightSource.color.r *= increase;
+      lightSource.color.g *= increase;
+      lightSource.color.b *= increase;
+    }
+  })
   
   addEvent(['click'], (x, y) => {
     if (sources.length >= MAX_SOURCES) {
@@ -199,9 +227,7 @@ const initEverything = () => {
       },
       intensity: lightSource.intensity,
       color: {
-        r: 1,
-        g: 1,
-        b: 1,
+        ...lightSource.color,
       },
     }
 
