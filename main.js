@@ -110,7 +110,7 @@ const initEverything = () => {
       x: 400,
       y: 400,
     },
-    intensity: 10,
+    intensity: 20,
   }
 
   setInterval(() => {
@@ -156,6 +156,19 @@ const initEverything = () => {
       });
     });
   }
+
+  window.addEventListener('wheel', (e) => {
+    const delta = e.deltaY;
+
+    if (delta > 0) {
+      lightSource.intensity += 1;
+    } else {
+      lightSource.intensity -= 1;
+    }
+
+    lightSource.intensity = Math.max(0.1, lightSource.intensity);
+    lightSource.intensity = Math.min(100, lightSource.intensity);
+  })
   
   addEvent(['click'], (x, y) => {
     if (sources.length >= MAX_SOURCES) {
