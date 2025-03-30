@@ -259,8 +259,12 @@ const initEverything = () => {
       }
     }
   })
+
+  let wasTouchClickStarted = false;
+  let touchClickTimeout = null
   
   addEvent(['click'], (x, y) => {
+    wasTouchClickStarted = false;
     if (sources.length >= MAX_SOURCES) {
       return;
     }
@@ -289,8 +293,29 @@ const initEverything = () => {
     }
   });
 
+  addEvent(['touchstart'], (x, y) => {
+    if (touchClickTimeout) {
+      clearTimeout(touchClickTimeout);
+    }
+
+    wasTouchClickStarted = true;
+    touchClickTimeout = setTimeout(() => {
+      wasTouchClickStarted = false;
+    }, 100);
+  })
+
   addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
     state.isMovingSourceManually = false;
+    if (wasTouchClickStarted) {
+      sources.push({
+        isVisible: true,
+        position: { x, y },
+        intensity: lightSource.intensity,
+        color: {
+          ...lightSource.color,
+        },
+      });
+    }
   });
 
   function flattenSources(sources) {
