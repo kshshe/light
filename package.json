@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@parcel/packager-raw-url": "^2.14.3",
+    "@parcel/transformer-webmanifest": "^2.14.3",
     "parcel": "^2.10.3"
   },
   "dependencies": {
