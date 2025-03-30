@@ -39,6 +39,10 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
   });
 
   window.addEventListener('keydown', (e) => {
+    if (e.key === 'r') {
+      state.isMovingSourceManually = false;
+    }
+
     if (e.key === 'c') {
       const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
       const randomColor = PRETTY_COLORS[randomIndex];
