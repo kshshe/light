@@ -185,7 +185,7 @@ const initEverything = () => {
         x,
         y,
       },
-      intensity: 10,
+      intensity: lightSource.intensity,
     }
 
     sources.push(newLightSource);
