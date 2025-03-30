@@ -2,6 +2,10 @@ const MAX_SOURCES = 10;
 const MAX_OBSTACLES = 10;
 
 const initEverything = () => {
+  const state = {
+    isMovingSourceManually: false,
+  }
+
   const GpuConstructor = GPU.GPU ?? GPU;
   if (!GpuConstructor) {
     throw new Error('GPU.js is not loaded properly');
@@ -109,23 +113,37 @@ const initEverything = () => {
     intensity: 10,
   }
 
-  const autoMovingSource = {
-    isVisible: false,
-    position: {
-      x: 100,
-      y: 100,
-    },
-    intensity: 10,
-  }
-  const sources = [lightSource, autoMovingSource];
+  setInterval(() => {
+    if (!lightSource.targetPosition) {
+      return;
+    }
+
+    const xDiff = lightSource.targetPosition.x - lightSource.position.x;
+    const yDiff = lightSource.targetPosition.y - lightSource.position.y;
+
+    lightSource.position.x += xDiff / 10;
+    lightSource.position.y += yDiff / 10;
+  }, 10)
+
+  const sources = [lightSource];
 
   setInterval(() => {
+    if (state.isMovingSourceManually) {
+      return;
+    }
+
     const leftX = window.innerWidth / 2;
     const topY = window.innerHeight / 2;
 
-    autoMovingSource.position.x = leftX + 100 * Math.cos(Date.now() / 1000);
-    autoMovingSource.position.y = topY + 100 * Math.sin(Date.now() / 1000);
-    autoMovingSource.isVisible = true;
+    if (!lightSource.targetPosition) {
+      lightSource.targetPosition = {
+        ...lightSource.position,
+      }
+    }
+
+    lightSource.targetPosition.x = leftX + 100 * Math.cos(Date.now() / 1000);
+    lightSource.targetPosition.y = topY + 100 * Math.sin(Date.now() / 1000);
+    lightSource.isVisible = true;
   }, 10);
 
   const addEvent = (events, callback) => {
@@ -157,13 +175,16 @@ const initEverything = () => {
   })
 
   addEvent(['mousemove', 'touchmove'], (x, y) => {
+    state.isMovingSourceManually = true;
     lightSource.isVisible = true;
-    lightSource.position.x = x;
-    lightSource.position.y = y;
+    lightSource.targetPosition = {
+      x,
+      y,
+    }
   });
 
   addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
-    lightSource.isVisible = false;
+    state.isMovingSourceManually = false;
   });
 
   function flattenSources(sources) {
