@@ -38,13 +38,18 @@ const initEverything = () => {
     const x = this.thread.x;
     const y = this.thread.y;
 
-    let sumOfIntensities = 0;
+    let sumOfIntensitiesR = 0;
+    let sumOfIntensitiesG = 0;
+    let sumOfIntensitiesB = 0;
 
     for (let i = 0; i < this.constants.sourcesCount; i++) {
-      const startIndex = i * 3;
+      const startIndex = i * 6;
       const sourceX = sources[startIndex];
       const sourceY = sources[startIndex + 1];
       const sourceIntensity = sources[startIndex + 2];
+      const sourceColorR = sources[startIndex + 3];
+      const sourceColorG = sources[startIndex + 4];
+      const sourceColorB = sources[startIndex + 5];
 
       if (sourceIntensity > 0) {
         const distance = Math.sqrt((x - sourceX) ** 2 + (y - sourceY) ** 2);
@@ -65,11 +70,13 @@ const initEverything = () => {
           }
         }
 
-        sumOfIntensities += intensity * opacitiesResult;
+        sumOfIntensitiesR += intensity * opacitiesResult * sourceColorR;
+        sumOfIntensitiesG += intensity * opacitiesResult * sourceColorG;
+        sumOfIntensitiesB += intensity * opacitiesResult * sourceColorB;
       }
     }
 
-    this.color(sumOfIntensities, sumOfIntensities, sumOfIntensities);
+    this.color(sumOfIntensitiesR, sumOfIntensitiesG, sumOfIntensitiesB);
   }, {
     constants: {
       sourcesCount: MAX_SOURCES,
@@ -111,6 +118,11 @@ const initEverything = () => {
       y: 400,
     },
     intensity: 20,
+    color: {
+      r: 1,
+      g: 1,
+      b: 1,
+    },
   }
 
   setInterval(() => {
@@ -186,6 +198,11 @@ const initEverything = () => {
         y,
       },
       intensity: lightSource.intensity,
+      color: {
+        r: 1,
+        g: 1,
+        b: 1,
+      },
     }
 
     sources.push(newLightSource);
@@ -209,10 +226,13 @@ const initEverything = () => {
       source.position.x,
       source.position.y,
       source.intensity,
+      source.color.r,
+      source.color.g,
+      source.color.b,
     ]);
 
-    if (flattenedSources.length < MAX_SOURCES * 3) {
-      flattenedSources.push(...Array(MAX_SOURCES * 3 - flattenedSources.length).fill(0));
+    if (flattenedSources.length < MAX_SOURCES * 6) {
+      flattenedSources.push(...Array(MAX_SOURCES * 6 - flattenedSources.length).fill(0));
     }
 
     return flattenedSources;
