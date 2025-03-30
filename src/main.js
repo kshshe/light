@@ -250,6 +250,14 @@ const initEverything = () => {
       lightSource.color.g *= increase;
       lightSource.color.b *= increase;
     }
+
+    if (e.key === 'f') {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    }
   })
   
   addEvent(['click'], (x, y) => {
