@@ -216,6 +216,12 @@ const initEverything = () => {
   const addEvent = (events, callback) => {
     events.forEach(event => {
       window.addEventListener(event, (e) => {
+        try {
+          e.preventDefault();
+        } catch (error) {
+          console.error(error);
+        }
+
         const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
         const y = window.innerHeight - (e.clientY ?? e.touches?.[0]?.clientY ?? 0);
 
@@ -238,6 +244,7 @@ const initEverything = () => {
   })
 
   window.addEventListener('keydown', (e) => {
+    e.preventDefault();
     if (e.key === 'c') {
       const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
       const randomColor = PRETTY_COLORS[randomIndex];
@@ -249,14 +256,6 @@ const initEverything = () => {
       lightSource.color.r *= increase;
       lightSource.color.g *= increase;
       lightSource.color.b *= increase;
-    }
-
-    if (e.key === 'f') {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        document.documentElement.requestFullscreen();
-      }
     }
   })
 
