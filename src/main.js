@@ -1,3 +1,7 @@
+import { inject } from "@vercel/analytics"
+
+inject()
+
 const MAX_SOURCES = 10;
 const MAX_OBSTACLES = 10;
 

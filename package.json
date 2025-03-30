@@ -12,5 +12,8 @@
   "description": "",
   "devDependencies": {
     "parcel": "^2.10.3"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0"
   }
 }
