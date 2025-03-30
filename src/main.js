@@ -262,6 +262,10 @@ const initEverything = () => {
 
   let wasTouchClickStarted = false;
   let touchClickTimeout = null
+  const touchClickPosition = {
+    x: 0,
+    y: 0,
+  }
   
   addEvent(['click'], (x, y) => {
     wasTouchClickStarted = false;
@@ -299,6 +303,8 @@ const initEverything = () => {
     }
 
     wasTouchClickStarted = true;
+    touchClickPosition.x = x;
+    touchClickPosition.y = y;
     touchClickTimeout = setTimeout(() => {
       wasTouchClickStarted = false;
     }, 100);
@@ -309,7 +315,7 @@ const initEverything = () => {
     if (wasTouchClickStarted) {
       sources.push({
         isVisible: true,
-        position: { x, y },
+        position: { x: touchClickPosition.x, y: touchClickPosition.y },
         intensity: lightSource.intensity,
         color: {
           ...lightSource.color,
