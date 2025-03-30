@@ -144,6 +144,10 @@ const initEverything = () => {
     lightSource.targetPosition.x = leftX + 100 * Math.cos(Date.now() / 1000);
     lightSource.targetPosition.y = topY + 100 * Math.sin(Date.now() / 1000);
     lightSource.isVisible = true;
+    if (lightSource.intensity !== 10) {
+      const diff = 10 - lightSource.intensity;
+      lightSource.intensity += diff / 50;
+    }
   }, 10);
 
   const addEvent = (events, callback) => {
