@@ -1,6 +1,9 @@
 import { inject } from "@vercel/analytics"
 import { MAX_SOURCES, MAX_OBSTACLES, PRETTY_COLORS } from './constants.js'
 import { initializeEvents } from './events.js'
+import { flattenSources } from './utils/flattenSources.js'
+import { flattenObstacles } from './utils/flattenObstacles.js'
+import { getSquare } from './utils/getSquare.js'
 
 inject()
 
@@ -130,77 +133,6 @@ const initEverything = () => {
   }
 
   const sources = [lightSource];
-
-  function flattenSources(sources) {
-    const flattenedSources = sources.flatMap(source => [
-      source.position.x,
-      source.position.y,
-      source.intensity,
-      source.color.r,
-      source.color.g,
-      source.color.b,
-    ]);
-
-    if (flattenedSources.length < MAX_SOURCES * 6) {
-      flattenedSources.push(...Array(MAX_SOURCES * 6 - flattenedSources.length).fill(0));
-    }
-
-    return flattenedSources;
-  }
-
-  function flattenObstacles(obstacles) {
-    const flattenedObstacles = obstacles.flatMap(obstacle => [
-      obstacle.startX,
-      obstacle.startY,
-      obstacle.endX,
-      obstacle.endY,
-      obstacle.opacity,
-    ]);
-
-    if (flattenedObstacles.length < MAX_OBSTACLES * 5) {
-      flattenedObstacles.push(...Array(MAX_OBSTACLES * 5 - flattenedObstacles.length).fill(0));
-    }
-
-    return flattenedObstacles;
-  }
-
-  function getSquare(options) {
-    return [
-      // Square
-      // left side
-      {
-        startX: options.x,
-        startY: window.innerHeight - options.y,
-        endX: options.x,
-        endY: window.innerHeight - (options.y + options.height),
-        opacity: 0.4,
-      },
-      // right side
-      {
-        startX: options.x + options.width,
-        startY: window.innerHeight - options.y,
-        endX: options.x + options.width,
-        endY: window.innerHeight - (options.y + options.height),
-        opacity: 0.4,
-      },
-      // bottom side
-      {
-        startX: options.x,
-        startY: window.innerHeight - (options.y + options.height),
-        endX: options.x + options.width,
-        endY: window.innerHeight - (options.y + options.height),
-        opacity: 0.4,
-      },
-      // top side
-      {
-        startX: options.x,
-        startY: window.innerHeight - options.y,
-        endX: options.x + options.width - options.width / 2,
-        endY: window.innerHeight - options.y,
-        opacity: 0.4,
-      }
-    ]
-  }
 
   const obstacles = [
     ...getSquare({
