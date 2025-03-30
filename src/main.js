@@ -1,6 +1,37 @@
 const MAX_SOURCES = 10;
 const MAX_OBSTACLES = 10;
 
+const PRETTY_COLORS = [
+  { r: 0.95, g: 0.80, b: 0.81 }, // Pastel Pink
+  { r: 0.80, g: 0.89, b: 0.95 }, // Pastel Blue
+  { r: 0.87, g: 0.95, b: 0.80 }, // Pastel Green
+  { r: 0.95, g: 0.95, b: 0.80 }, // Pastel Yellow
+  { r: 0.95, g: 0.87, b: 0.73 }, // Pastel Peach
+  { r: 0.89, g: 0.80, b: 0.95 }, // Pastel Lavender
+  { r: 0.80, g: 0.95, b: 0.91 }, // Pastel Mint
+  { r: 0.95, g: 0.85, b: 0.95 }, // Pastel Lilac
+  { r: 0.89, g: 0.82, b: 0.75 }, // Pastel Taupe
+  { r: 0.84, g: 0.95, b: 0.88 },  // Pastel Seafoam
+
+  // Neon colors
+  { r: 1.0, g: 0.0, b: 1.0 },   // Neon Pink
+  { r: 0.0, g: 1.0, b: 0.0 },   // Neon Green
+  { r: 1.0, g: 0.8, b: 0.0 },   // Neon Orange
+  { r: 0.0, g: 1.0, b: 1.0 },   // Neon Cyan
+  { r: 1.0, g: 0.0, b: 0.0 },   // Neon Red
+  { r: 0.5, g: 0.0, b: 1.0 },   // Neon Purple
+  { r: 0.8, g: 1.0, b: 0.0 },   // Neon Lime
+  { r: 1.0, g: 0.0, b: 0.5 },   // Neon Magenta
+  { r: 0.0, g: 0.5, b: 1.0 },   // Neon Blue
+  { r: 1.0, g: 1.0, b: 0.0 },   // Neon Yellow
+
+  // Basic colors
+  { r: 1.0, g: 0.0, b: 0.0 },   // Red
+  { r: 0.0, g: 1.0, b: 0.0 },   // Green
+  { r: 0.0, g: 0.0, b: 1.0 },   // Blue
+  { r: 1.0, g: 1.0, b: 1.0 },   // White
+]
+
 const initEverything = () => {
   const state = {
     isMovingSourceManually: false,
@@ -111,17 +142,18 @@ const initEverything = () => {
   const canvas = render.canvas;
   document.getElementsByTagName('body')[0].appendChild(canvas);
 
+  const randomInitialColor = PRETTY_COLORS[Math.floor(Math.random() * PRETTY_COLORS.length)];
   const lightSource = {
     isVisible: false,
     position: {
-      x: 400,
-      y: 400,
+      x: window.innerWidth * Math.random(),
+      y: window.innerHeight * Math.random(),
     },
     intensity: 20,
     color: {
-      r: 1,
-      g: 1,
-      b: 1,
+      r: randomInitialColor.r / 3,
+      g: randomInitialColor.g / 3,
+      b: randomInitialColor.b / 3,
     },
   }
 
@@ -200,37 +232,6 @@ const initEverything = () => {
     lightSource.intensity = Math.max(0.1, lightSource.intensity);
     lightSource.intensity = Math.min(100, lightSource.intensity);
   })
-
-  const PRETTY_COLORS = [
-    { r: 0.95, g: 0.80, b: 0.81 }, // Pastel Pink
-    { r: 0.80, g: 0.89, b: 0.95 }, // Pastel Blue
-    { r: 0.87, g: 0.95, b: 0.80 }, // Pastel Green
-    { r: 0.95, g: 0.95, b: 0.80 }, // Pastel Yellow
-    { r: 0.95, g: 0.87, b: 0.73 }, // Pastel Peach
-    { r: 0.89, g: 0.80, b: 0.95 }, // Pastel Lavender
-    { r: 0.80, g: 0.95, b: 0.91 }, // Pastel Mint
-    { r: 0.95, g: 0.85, b: 0.95 }, // Pastel Lilac
-    { r: 0.89, g: 0.82, b: 0.75 }, // Pastel Taupe
-    { r: 0.84, g: 0.95, b: 0.88 },  // Pastel Seafoam
-
-    // Neon colors
-    { r: 1.0, g: 0.0, b: 1.0 },   // Neon Pink
-    { r: 0.0, g: 1.0, b: 0.0 },   // Neon Green
-    { r: 1.0, g: 0.8, b: 0.0 },   // Neon Orange
-    { r: 0.0, g: 1.0, b: 1.0 },   // Neon Cyan
-    { r: 1.0, g: 0.0, b: 0.0 },   // Neon Red
-    { r: 0.5, g: 0.0, b: 1.0 },   // Neon Purple
-    { r: 0.8, g: 1.0, b: 0.0 },   // Neon Lime
-    { r: 1.0, g: 0.0, b: 0.5 },   // Neon Magenta
-    { r: 0.0, g: 0.5, b: 1.0 },   // Neon Blue
-    { r: 1.0, g: 1.0, b: 0.0 },   // Neon Yellow
-
-    // Basic colors
-    { r: 1.0, g: 0.0, b: 0.0 },   // Red
-    { r: 0.0, g: 1.0, b: 0.0 },   // Green
-    { r: 0.0, g: 0.0, b: 1.0 },   // Blue
-    { r: 1.0, g: 1.0, b: 1.0 },   // White
-  ]
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'c') {
