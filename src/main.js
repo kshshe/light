@@ -244,7 +244,6 @@ const initEverything = () => {
   })
 
   window.addEventListener('keydown', (e) => {
-    e.preventDefault();
     if (e.key === 'c') {
       const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
       const randomColor = PRETTY_COLORS[randomIndex];
