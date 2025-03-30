@@ -46,23 +46,22 @@ const initEverything = () => {
         const distance = Math.sqrt((x - sourceX) ** 2 + (y - sourceY) ** 2);
         const intensity = sourceIntensity / distance;
 
-        let hasObstacleInPath = false;
+        let opacitiesResult = 1;
         for (let j = 0; j < this.constants.obstaclesCount; j++) {
-          const obstacleStartX = obstacles[j * 4];
-          const obstacleStartY = obstacles[j * 4 + 1];
-          const obstacleEndX = obstacles[j * 4 + 2];
-          const obstacleEndY = obstacles[j * 4 + 3];
+          const obstacleStartX = obstacles[j * 5];
+          const obstacleStartY = obstacles[j * 5 + 1];
+          const obstacleEndX = obstacles[j * 5 + 2];
+          const obstacleEndY = obstacles[j * 5 + 3];
+          const obstacleOpacity = obstacles[j * 5 + 4];
 
           if (obstacleEndX !== obstacleStartX || obstacleEndY !== obstacleStartY) {
             if (intersect(sourceX, sourceY, x, y, obstacleStartX, obstacleStartY, obstacleEndX, obstacleEndY) === 0) {
-              hasObstacleInPath = true;
+              opacitiesResult *= obstacleOpacity;
             }
           }
         }
 
-        if (!hasObstacleInPath) {
-          sumOfIntensities += intensity;
-        }
+        sumOfIntensities += intensity * opacitiesResult;
       }
     }
 
@@ -187,10 +186,11 @@ const initEverything = () => {
       obstacle.startY,
       obstacle.endX,
       obstacle.endY,
+      obstacle.opacity,
     ]);
 
-    if (flattenedObstacles.length < MAX_OBSTACLES * 4) {
-      flattenedObstacles.push(...Array(MAX_OBSTACLES * 4 - flattenedObstacles.length).fill(0));
+    if (flattenedObstacles.length < MAX_OBSTACLES * 5) {
+      flattenedObstacles.push(...Array(MAX_OBSTACLES * 5 - flattenedObstacles.length).fill(0));
     }
 
     return flattenedObstacles;
@@ -205,6 +205,7 @@ const initEverything = () => {
         startY: window.innerHeight - options.y,
         endX: options.x,
         endY: window.innerHeight - (options.y + options.height),
+        opacity: 0.4,
       },
       // right side
       {
@@ -212,6 +213,7 @@ const initEverything = () => {
         startY: window.innerHeight - options.y,
         endX: options.x + options.width,
         endY: window.innerHeight - (options.y + options.height),
+        opacity: 0.4,
       },
       // bottom side
       {
@@ -219,6 +221,7 @@ const initEverything = () => {
         startY: window.innerHeight - (options.y + options.height),
         endX: options.x + options.width,
         endY: window.innerHeight - (options.y + options.height),
+        opacity: 0.4,
       },
       // top side
       {
@@ -226,6 +229,7 @@ const initEverything = () => {
         startY: window.innerHeight - options.y,
         endX: options.x + options.width - options.width / 2,
         endY: window.innerHeight - options.y,
+        opacity: 0.4,
       }
     ]
   }
