@@ -3,7 +3,6 @@ import { MAX_SOURCES, MAX_OBSTACLES, PRETTY_COLORS } from './constants.js'
 import { initializeEvents } from './events.js'
 import { flattenSources } from './utils/flattenSources.js'
 import { flattenObstacles } from './utils/flattenObstacles.js'
-import { getSquare } from './utils/getSquare.js'
 import { getCircle } from "./utils/getCircle.js"
 
 inject()
