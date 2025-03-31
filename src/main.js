@@ -1,14 +1,15 @@
 import { inject } from "@vercel/analytics"
-import { MAX_SOURCES, MAX_OBSTACLES, PRETTY_COLORS } from './constants.js'
+import { MAX_SOURCES, MAX_OBSTACLES } from './constants.js'
 import { initializeEvents } from './events.js'
 import { flattenSources } from './utils/flattenSources.js'
 import { flattenObstacles } from './utils/flattenObstacles.js'
 import { getCircle } from "./utils/getCircle.js"
 
 inject()
+const isDev = location.hostname === 'localhost';
 
 const initEverything = () => {
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator && !isDev) {
     console.log('Service Worker supported');
     navigator.serviceWorker.register(new URL('../sw.js', import.meta.url), {
       scope: '/'
@@ -154,17 +155,18 @@ const initEverything = () => {
       height: 100,
     }),
   ]
-
-  console.log(obstacles);
   
   const desktopHints = document.querySelector('.desktop-hints');
   const mobileHints = document.querySelector('.mobile-hints');
+  let shownHintElement = null;
 
   const isMobile = window.innerWidth < 768;
   if (isMobile) {
     mobileHints.classList.remove('hidden');
+    shownHintElement = mobileHints;
   } else {
     desktopHints.classList.remove('hidden');
+    shownHintElement = desktopHints;
   }
 
   const fpsElement = document.getElementById('fps');
@@ -202,10 +204,36 @@ const initEverything = () => {
     requestAnimationFrame(processFrame);
   }
 
-  draw();
+  const hintRect = shownHintElement.getBoundingClientRect();
+  const hintRightX = hintRect.right;
+  const hintTopY = hintRect.top;
+
+  const hintPadding = 20;
+  const topBorder = {
+    isVisible: true,
+    opacity: 0.8,
+    startX: 1,
+    startY: window.innerHeight - hintTopY + hintPadding,
+    endX: hintRightX + hintPadding,
+    endY: window.innerHeight - hintTopY + hintPadding,
+  }
+  const rightBorder = {
+    isVisible: true,
+    opacity: 0.8,
+    startX: hintRightX + hintPadding,
+    startY: 1,
+    endX: hintRightX + hintPadding,
+    endY: window.innerHeight - hintTopY + hintPadding,
+  }
+  
+  obstacles.push(topBorder, rightBorder);
+
+  console.log(obstacles);
 
   // Initialize all event listeners
   initializeEvents(lightSource, sources, state, MAX_SOURCES, obstacles);
+
+  draw();
 }
 
 window.addEventListener('load', initEverything);

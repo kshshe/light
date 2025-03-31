@@ -1,6 +1,6 @@
 import { MAX_OBSTACLES } from "../constants";
 
-const CIRCLE_SEGMENTS = MAX_OBSTACLES;
+const CIRCLE_SEGMENTS = 6;
 
 export const getCircle = (options) => {
   const leftX = options.x;
