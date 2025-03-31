@@ -155,8 +155,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
       lightSource.color.b += diff / 50;
     }
     
-    lightSource.targetPosition.x = leftX + 100 * Math.cos(Date.now() / 2000);
-    lightSource.targetPosition.y = topY + 100 * Math.sin(Date.now() / 2000);
+    lightSource.targetPosition.x = leftX + 150 * Math.cos(Date.now() / 2000);
+    lightSource.targetPosition.y = topY + 150 * Math.sin(Date.now() / 2000);
     lightSource.isVisible = true;
     if (lightSource.intensity !== 20) {
       const diff = 20 - lightSource.intensity;
