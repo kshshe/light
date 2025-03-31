@@ -117,15 +117,6 @@ const initEverything = () => {
   const canvas = render.canvas;
   document.getElementsByTagName('body')[0].appendChild(canvas);
 
-  const isTouchOnly = window.matchMedia('(pointer: coarse)').matches;
-  if (!isTouchOnly) {
-    // Show the hint element for non-touch devices
-    const hintElement = document.getElementById('hint-element');
-    if (hintElement) {
-      hintElement.style.display = 'block';
-    }
-  }
-
   const lightSource = {
     isVisible: false,
     position: {
