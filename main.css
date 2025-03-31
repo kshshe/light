@@ -19,7 +19,8 @@ canvas {
   transform-origin: 0 0;
 }
 
-.hint-element {
+.hint-element,
+.fps-element {
   position: fixed;
   bottom: 20px;
   left: 20px;
@@ -31,3 +32,13 @@ canvas {
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
   display: none;
 } 
+
+.fps-element {
+  top: 20px;
+  left: 20px;
+  display: block;
+}
+
+#fps {
+  display: none;
+}

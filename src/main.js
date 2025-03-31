@@ -153,7 +153,26 @@ const initEverything = () => {
 
   console.log(obstacles);
 
+  const fpsElement = document.getElementById('fps');
+  const lastFramesTimes = [];
+
+  setInterval(() => {
+    const averageTime = lastFramesTimes.length / (lastFramesTimes.reduce((a, b) => a + b, 0) / lastFramesTimes.length);
+    if (averageTime) {
+      const averageFps = 1000 / averageTime;
+      fpsElement.textContent = averageFps.toFixed(2);
+      fpsElement.style.display = 'inline';
+      lastFramesTimes.length = 0;
+    }
+  }, 1000);
+
+  let lastFrameTime = performance.now();
   function processFrame() {
+    const currentTime = performance.now();
+    const deltaTime = currentTime - lastFrameTime;
+    lastFrameTime = currentTime;
+    lastFramesTimes.push(deltaTime);
+
     const filteredSources = sources.filter(source => source.isVisible);
 
     const input = flattenSources(filteredSources);
