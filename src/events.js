@@ -10,8 +10,13 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
           console.error(error);
         }
 
-        const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
-        const y = window.innerHeight - (e.clientY ?? e.touches?.[0]?.clientY ?? 0);
+        // Get the raw client coordinates
+        const rawX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+        const rawY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+        
+        // Scale coordinates by 2 to match the canvas resolution
+        const x = rawX * 2;
+        const y = window.innerHeight * 2 - (rawY * 2);
 
         callback(x, y, e);
       });
@@ -131,8 +136,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
       return;
     }
 
-    const leftX = window.innerWidth / 2;
-    const topY = window.innerHeight / 2;
+    const leftX = window.innerWidth * 2 / 2;
+    const topY = window.innerHeight * 2 / 2;
     
     if (lightSource.color.r !== 1) {
       const diff = 1 - lightSource.color.r;
@@ -149,8 +154,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
       lightSource.color.b += diff / 50;
     }
 
-    const targetX = leftX + 150 * Math.cos(Date.now() / 2000);
-    const targetY = topY + 150 * Math.sin(Date.now() / 2000);
+    const targetX = leftX + 150 * 2 * Math.cos(Date.now() / 2000);
+    const targetY = topY + 150 * 2 * Math.sin(Date.now() / 2000);
 
     if (!lightSource.targetPosition) {
       lightSource.position = {

@@ -3,34 +3,34 @@ export const getSquare = (options) => {
     // Square
     // left side
     {
-      startX: options.x,
-      startY: window.innerHeight - options.y,
-      endX: options.x,
-      endY: window.innerHeight - (options.y + options.height),
+      startX: options.x * 2,
+      startY: window.innerHeight * 2 - (options.y * 2),
+      endX: options.x * 2,
+      endY: window.innerHeight * 2 - ((options.y + options.height) * 2),
       opacity: 0.4,
     },
     // right side
     {
-      startX: options.x + options.width,
-      startY: window.innerHeight - options.y,
-      endX: options.x + options.width,
-      endY: window.innerHeight - (options.y + options.height),
+      startX: (options.x + options.width) * 2,
+      startY: window.innerHeight * 2 - (options.y * 2),
+      endX: (options.x + options.width) * 2,
+      endY: window.innerHeight * 2 - ((options.y + options.height) * 2),
       opacity: 0.4,
     },
     // bottom side
     {
-      startX: options.x,
-      startY: window.innerHeight - (options.y + options.height),
-      endX: options.x + options.width,
-      endY: window.innerHeight - (options.y + options.height),
+      startX: options.x * 2,
+      startY: window.innerHeight * 2 - ((options.y + options.height) * 2),
+      endX: (options.x + options.width) * 2,
+      endY: window.innerHeight * 2 - ((options.y + options.height) * 2),
       opacity: 0.4,
     },
     // top side
     {
-      startX: options.x,
-      startY: window.innerHeight - options.y,
-      endX: options.x + options.width - options.width / 2,
-      endY: window.innerHeight - options.y,
+      startX: options.x * 2,
+      startY: window.innerHeight * 2 - (options.y * 2),
+      endX: (options.x + options.width - options.width / 2) * 2,
+      endY: window.innerHeight * 2 - (options.y * 2),
       opacity: 0.4,
     }
   ];
