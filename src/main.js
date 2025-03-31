@@ -126,18 +126,17 @@ const initEverything = () => {
     }
   }
 
-  const randomInitialColor = PRETTY_COLORS[Math.floor(Math.random() * PRETTY_COLORS.length)];
   const lightSource = {
     isVisible: false,
     position: {
       x: window.innerWidth * Math.random(),
       y: window.innerHeight * Math.random(),
     },
-    intensity: 20,
+    intensity: 0,
     color: {
-      r: randomInitialColor.r / 3,
-      g: randomInitialColor.g / 3,
-      b: randomInitialColor.b / 3,
+      r: 1,
+      g: 1,
+      b: 1,
     },
   }
 

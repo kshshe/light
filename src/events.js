@@ -133,12 +133,6 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
 
     const leftX = window.innerWidth / 2;
     const topY = window.innerHeight / 2;
-
-    if (!lightSource.targetPosition) {
-      lightSource.targetPosition = {
-        ...lightSource.position,
-      };
-    }
     
     if (lightSource.color.r !== 1) {
       const diff = 1 - lightSource.color.r;
@@ -154,9 +148,23 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
       const diff = 1 - lightSource.color.b;
       lightSource.color.b += diff / 50;
     }
+
+    const targetX = leftX + 150 * Math.cos(Date.now() / 2000);
+    const targetY = topY + 150 * Math.sin(Date.now() / 2000);
+
+    if (!lightSource.targetPosition) {
+      lightSource.position = {
+        x: targetX,
+        y: targetY,
+      };
+      lightSource.targetPosition = {
+        x: targetX,
+        y: targetY,
+      };
+    }
     
-    lightSource.targetPosition.x = leftX + 150 * Math.cos(Date.now() / 2000);
-    lightSource.targetPosition.y = topY + 150 * Math.sin(Date.now() / 2000);
+    lightSource.targetPosition.x = targetX;
+    lightSource.targetPosition.y = targetY;
     lightSource.isVisible = true;
     if (lightSource.intensity !== 20) {
       const diff = 20 - lightSource.intensity;
