@@ -89,7 +89,7 @@ const initEverything = () => {
       obstaclesCount: MAX_OBSTACLES,
     }
   })
-    .setOutput([window.innerWidth * 2, window.innerHeight * 2])
+    .setOutput([window.innerWidth, window.innerHeight])
     .setGraphical(true)
     .addFunction(ccw, {
       argumentTypes: {
@@ -120,8 +120,8 @@ const initEverything = () => {
   const lightSource = {
     isVisible: false,
     position: {
-      x: window.innerWidth * 2 * Math.random(),
-      y: window.innerHeight * 2 * Math.random(),
+      x: window.innerWidth * Math.random(),
+      y: window.innerHeight * Math.random(),
     },
     intensity: 0,
     color: {

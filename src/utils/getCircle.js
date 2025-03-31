@@ -3,10 +3,10 @@ import { MAX_OBSTACLES } from "../constants";
 const CIRCLE_SEGMENTS = MAX_OBSTACLES;
 
 export const getCircle = (options) => {
-  const leftX = options.x * 2;
-  const rightX = (options.x + options.width) * 2;
-  const topY = options.y * 2;
-  const bottomY = (options.y + options.height) * 2;
+  const leftX = options.x;
+  const rightX = options.x + options.width;
+  const topY = options.y;
+  const bottomY = options.y + options.height;
 
   const centerX = (leftX + rightX) / 2;
   const centerY = (topY + bottomY) / 2;
