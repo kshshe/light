@@ -143,6 +143,16 @@ const initEverything = () => {
   ]
 
   console.log(obstacles);
+  
+  const desktopHints = document.querySelector('.desktop-hints');
+  const mobileHints = document.querySelector('.mobile-hints');
+
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    mobileHints.classList.remove('hidden');
+  } else {
+    desktopHints.classList.remove('hidden');
+  }
 
   const fpsElement = document.getElementById('fps');
   const lastFramesTimes = [];

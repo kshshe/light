@@ -19,7 +19,8 @@ canvas {
   cursor: none;
 }
 
-.hint-element,
+.desktop-hints,
+.mobile-hints,
 .fps-element {
   position: fixed;
   bottom: 20px;
@@ -31,6 +32,10 @@ canvas {
   z-index: 10;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 } 
+
+.hidden {
+  display: none;
+}
 
 .fps-element {
   top: 20px;
