@@ -47,7 +47,9 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME)
           .then((cache) => {
             if (response.status === 200) {
-              cache.put(event.request, responseToCache);
+              try {
+                cache.put(event.request, responseToCache)
+              } catch {}
             }
           })
           .catch(() => {});
