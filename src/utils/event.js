@@ -11,7 +11,7 @@ export const addEvent = (events, callback) => {
             const y = window.innerHeight - (e.clientY ?? e.touches?.[0]?.clientY ?? 0);
 
             callback(x, y, e);
-        });
+        }, { passive: false });
     });
 };
 

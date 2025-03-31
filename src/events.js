@@ -1,10 +1,57 @@
 import { PRETTY_COLORS } from './constants.js';
 import { addEvent, addKeydownEvent } from './utils/event.js';
 
+const RANDOM_SOURCES_COUNT = 3;
+
+const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource) => {
+  if (sources.length >= MAX_SOURCES) {
+    return;
+  }
+
+  const availableSources = MAX_SOURCES - sources.length;
+  const randomSourcesCount = Math.min(availableSources, RANDOM_SOURCES_COUNT);
+  if (randomSources.length === 0) {
+    for (let i = 0; i < randomSourcesCount; i++) {
+      const newSource = {
+        isVisible: true,
+        position: {
+          ...lightSource.position,
+        },
+        targetPosition: {
+          ...lightSource.position,
+        },
+        intensity: 0,
+        color: {
+          ...lightSource.color,
+        },
+      }
+      randomSources.push(newSource);
+      sources.push(newSource);
+    }
+  }
+
+  randomSources.forEach(source => {
+    source.targetPosition.x = Math.random() * window.innerWidth;
+    source.targetPosition.y = Math.random() * window.innerHeight;
+    source.intensity = Math.round(Math.random() * 70 + 10);
+    source.isVisible = true;
+
+    source.color.r = Math.random();
+    source.color.g = Math.random();
+    source.color.b = Math.random();
+  });
+};
+
 export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obstacles) => {
   let wasTouchClickStarted = false;
   let touchClickTimeout = null;
+  let longPressTimeout = null;
+  let isLongPressing = false;
   const touchClickPosition = {
+    x: 0,
+    y: 0,
+  };
+  const touchStartPosition = {
     x: 0,
     y: 0,
   };
@@ -24,45 +71,9 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     lightSource.intensity = Math.min(100, lightSource.intensity);
   });
 
-  const RANDOM_SOURCES_COUNT = 3;
   const randomSources = [];
   addKeydownEvent([' '], () => {
-    if (sources.length >= MAX_SOURCES) {
-      return;
-    }
-    
-    const availableSources = MAX_SOURCES - sources.length;
-    const randomSourcesCount = Math.min(availableSources, RANDOM_SOURCES_COUNT);
-    if (randomSources.length === 0) {
-      for (let i = 0; i < randomSourcesCount; i++) {
-        const newSource = {
-          isVisible: true,
-          position: {
-            ...lightSource.position,
-          },
-          targetPosition: {
-            ...lightSource.position,
-          },
-          intensity: 0,
-          color: {
-            ...lightSource.color,
-          },
-        }
-        randomSources.push(newSource);
-        sources.push(newSource);
-      }
-    }
-
-    randomSources.forEach(source => {
-      source.targetPosition.x = Math.random() * window.innerWidth;
-      source.targetPosition.y = Math.random() * window.innerHeight;
-      source.intensity = Math.round(Math.random() * 70 + 10);
-      source.isVisible = true;
-
-      source.color.r = Math.random();
-      source.color.g = Math.random();
-      source.color.b = Math.random();
-    });
+    addOrMoveRandomSources(sources, MAX_SOURCES, randomSources, lightSource);
   });
 
   addKeydownEvent(['h', 'р'], () => {
@@ -115,6 +126,17 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
   });
 
   addEvent(['mousemove', 'touchmove'], (x, y, e) => {
+    if (longPressTimeout) {
+      const deltaX = x - touchStartPosition.x;
+      const deltaY = y - touchStartPosition.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance > 20) {
+        clearTimeout(longPressTimeout);
+        isLongPressing = false;
+      }
+
+    }
     state.isMovingSourceManually = true;
     lightSource.isVisible = true;
     lightSource.targetPosition = {
@@ -127,6 +149,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     if (e.touches?.length > 1) {
       wasTouchClickStarted = false;
       if (touchClickTimeout) clearTimeout(touchClickTimeout);
+      if (longPressTimeout) clearTimeout(longPressTimeout);
+      isLongPressing = false;
       return;
     }
 
@@ -134,19 +158,44 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       clearTimeout(touchClickTimeout);
     }
 
+    if (longPressTimeout) {
+      clearTimeout(longPressTimeout);
+    }
+
+    isLongPressing = false;
+
     wasTouchClickStarted = true;
     touchClickPosition.x = x;
     touchClickPosition.y = y;
+    touchStartPosition.x = x;
+    touchStartPosition.y = y;
+
     touchClickTimeout = setTimeout(() => {
       wasTouchClickStarted = false;
-    }, 100);
+    }, 200);
+
+    longPressTimeout = setTimeout(() => {
+      isLongPressing = true;
+      wasTouchClickStarted = false;
+      if (touchClickTimeout) clearTimeout(touchClickTimeout);
+
+      addOrMoveRandomSources(sources, MAX_SOURCES, randomSources, lightSource);
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    }, 500);
   });
 
   addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
     if (isPinching) return;
 
+    if (longPressTimeout) {
+      clearTimeout(longPressTimeout);
+    }
+
     state.isMovingSourceManually = false;
-    if (wasTouchClickStarted) {
+
+    if (wasTouchClickStarted && !isLongPressing) {
       if (sources.length >= MAX_SOURCES) {
         return;
       }
@@ -204,6 +253,9 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
   window.addEventListener('touchend', (e) => {
     if (isPinching && e.touches.length < 2) {
       isPinching = false;
+      wasTouchClickStarted = false;
+      if (longPressTimeout) clearTimeout(longPressTimeout);
+      isLongPressing = false;
       previousPinchDistance = 0;
       if (e.touches.length === 1) {
          state.isMovingSourceManually = true;
