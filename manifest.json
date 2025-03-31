@@ -19,5 +19,8 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "orientation": "any",
+  "scope": "/",
+  "prefer_related_applications": false
 } 

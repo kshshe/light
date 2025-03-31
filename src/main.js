@@ -8,6 +8,19 @@ import { getCircle } from "./utils/getCircle.js"
 inject()
 
 const initEverything = () => {
+  if ('serviceWorker' in navigator) {
+    console.log('Service Worker supported');
+    navigator.serviceWorker.register(new URL('../sw.js', import.meta.url), {
+      scope: '/'
+    })
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  }
+
   const state = {
     isMovingSourceManually: false,
   }
