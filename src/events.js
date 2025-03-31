@@ -1,7 +1,7 @@
 import { PRETTY_COLORS } from './constants.js';
 import { addEvent, addKeydownEvent } from './utils/event.js';
 
-export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
+export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obstacles) => {
   let wasTouchClickStarted = false;
   let touchClickTimeout = null;
   const touchClickPosition = {
@@ -20,6 +20,12 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
 
     lightSource.intensity = Math.max(0.1, lightSource.intensity);
     lightSource.intensity = Math.min(100, lightSource.intensity);
+  });
+
+  addKeydownEvent(['h', 'р'], () => {
+    obstacles.forEach(obstacle => {
+      obstacle.isVisible = !obstacle.isVisible;
+    });
   });
 
   addKeydownEvent(['r', 'к'], () => {

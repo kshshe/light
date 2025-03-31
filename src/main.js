@@ -165,9 +165,10 @@ const initEverything = () => {
     lastFramesTimes.push(deltaTime);
 
     const filteredSources = sources.filter(source => source.isVisible);
+    const filteredObstacles = obstacles.filter(obstacle => obstacle.isVisible);
 
     const input = flattenSources(filteredSources);
-    const obstaclesInput = flattenObstacles(obstacles);
+    const obstaclesInput = flattenObstacles(filteredObstacles);
 
     render(input, obstaclesInput);
 
@@ -181,7 +182,7 @@ const initEverything = () => {
   draw();
 
   // Initialize all event listeners
-  initializeEvents(lightSource, sources, state, MAX_SOURCES);
+  initializeEvents(lightSource, sources, state, MAX_SOURCES, obstacles);
 }
 
 window.addEventListener('load', initEverything);

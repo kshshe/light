@@ -28,6 +28,7 @@ export const getCircle = (options) => {
         endX: x,
         endY: y,
         opacity: 0.4,
+        isVisible: true,
       });
     }
 

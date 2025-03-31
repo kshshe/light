@@ -8,6 +8,7 @@ export const getSquare = (options) => {
       endX: options.x,
       endY: window.innerHeight - (options.y + options.height),
       opacity: 0.4,
+      isVisible: true,
     },
     // right side
     {
@@ -16,6 +17,7 @@ export const getSquare = (options) => {
       endX: options.x + options.width,
       endY: window.innerHeight - (options.y + options.height),
       opacity: 0.4,
+      isVisible: true,
     },
     // bottom side
     {
@@ -24,6 +26,7 @@ export const getSquare = (options) => {
       endX: options.x + options.width,
       endY: window.innerHeight - (options.y + options.height),
       opacity: 0.4,
+      isVisible: true,
     },
     // top side
     {
@@ -32,6 +35,7 @@ export const getSquare = (options) => {
       endX: options.x + options.width - options.width / 2,
       endY: window.innerHeight - options.y,
       opacity: 0.4,
+      isVisible: true,
     }
   ];
 }; 
