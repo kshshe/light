@@ -67,7 +67,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       lightSource.intensity -= 1;
     }
 
-    lightSource.intensity = Math.max(0.1, lightSource.intensity);
+    lightSource.intensity = Math.max(5, lightSource.intensity);
     lightSource.intensity = Math.min(100, lightSource.intensity);
   });
 
@@ -283,7 +283,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       if (previousPinchDistance > 0) {
         const scale = currentPinchDistance / previousPinchDistance;
         lightSource.intensity *= scale;
-        lightSource.intensity = Math.max(0.1, Math.min(100, lightSource.intensity));
+        lightSource.intensity = Math.max(5, Math.min(100, lightSource.intensity));
       }
 
       previousPinchDistance = currentPinchDistance;
