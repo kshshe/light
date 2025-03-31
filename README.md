@@ -16,6 +16,10 @@ A GPU-accelerated light simulation web application that renders dynamic light so
 
 Visit the live demo at: [https://light.sandgame.fyi](https://light.sandgame.fyi)
 
+## Screenshot
+
+![Light simulation screenshot](screenshot.png)
+
 ## Controls
 
 - **Click**: Add a new light source
