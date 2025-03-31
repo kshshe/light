@@ -8,6 +8,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     x: 0,
     y: 0,
   };
+  let isPinching = false;
+  let previousPinchDistance = 0;
 
   window.addEventListener('wheel', (e) => {
     const delta = e.deltaY;
@@ -86,7 +88,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     lightSource.color.b *= increase;
   });
   
-  addEvent(['click'], (x, y) => {
+  addEvent(['click'], (x, y, e) => {
+    if (isPinching) return;
     wasTouchClickStarted = false;
     if (sources.length >= MAX_SOURCES) {
       return;
@@ -111,7 +114,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     sources.push(newLightSource);
   });
 
-  addEvent(['mousemove', 'touchmove'], (x, y) => {
+  addEvent(['mousemove', 'touchmove'], (x, y, e) => {
     state.isMovingSourceManually = true;
     lightSource.isVisible = true;
     lightSource.targetPosition = {
@@ -120,7 +123,13 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     };
   });
 
-  addEvent(['touchstart'], (x, y) => {
+  addEvent(['touchstart'], (x, y, e) => {
+    if (e.touches?.length > 1) {
+      wasTouchClickStarted = false;
+      if (touchClickTimeout) clearTimeout(touchClickTimeout);
+      return;
+    }
+
     if (touchClickTimeout) {
       clearTimeout(touchClickTimeout);
     }
@@ -134,6 +143,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
   });
 
   addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
+    if (isPinching) return;
+
     state.isMovingSourceManually = false;
     if (wasTouchClickStarted) {
       if (sources.length >= MAX_SOURCES) {
@@ -157,6 +168,54 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       window.location.reload();
     }, 100);
   });
+
+  // --- Pinch Gesture Handling ---
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      isPinching = true;
+      state.isMovingSourceManually = false;
+      previousPinchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!isPinching || e.touches.length !== 2) return;
+
+    e.preventDefault();
+
+    const currentPinchDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+
+    if (previousPinchDistance > 0) {
+      const scale = currentPinchDistance / previousPinchDistance;
+      lightSource.intensity *= scale;
+      lightSource.intensity = Math.max(0.1, Math.min(100, lightSource.intensity));
+    }
+
+    previousPinchDistance = currentPinchDistance;
+  }, { passive: false });
+
+  window.addEventListener('touchend', (e) => {
+    if (isPinching && e.touches.length < 2) {
+      isPinching = false;
+      previousPinchDistance = 0;
+      if (e.touches.length === 1) {
+         state.isMovingSourceManually = true;
+         lightSource.isVisible = true;
+         lightSource.targetPosition = {
+           x: e.touches[0].clientX,
+           y: window.innerHeight - e.touches[0].clientY,
+         };
+      }
+    }
+  });
+  // --- End Pinch Gesture Handling ---
 
   // Initialize animation intervals
   setInterval(() => {
