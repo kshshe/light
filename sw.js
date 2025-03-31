@@ -30,54 +30,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - dynamically cache files on first access
+// Fetch event - network-first strategy for all requests
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
+  // Only handle GET requests
   if (event.request.method !== 'GET') {
     return;
   }
 
-  const url = new URL(event.request.url);
-  const isAssetFile = 
-    url.pathname.endsWith('.js') || 
-    url.pathname.endsWith('.css') || 
-    url.pathname.endsWith('.html') ||
-    url.pathname === '/';
-
-  if (isAssetFile) {
-    event.respondWith(
-      caches.match(event.request)
-        .then((cachedResponse) => {
-          // Return cached response if available
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-
-          // Otherwise fetch from network and cache
-          return fetch(event.request)
-            .then((response) => {
-              // Check if response is valid
-              if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
-              }
-
-              // Clone the response - one to return, one to cache
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => cache.put(event.request, responseToCache))
-                .catch(() => {});
-
-              return response;
-            });
-        })
-    );
-  } else {
-    // For non-asset files, try network first, then fall back to cache
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return caches.match(event.request);
-        })
-    );
-  }
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // Clone the response - one to return, one to cache
+        const responseToCache = response.clone();
+        
+        // Cache the fetched response
+        caches.open(CACHE_NAME)
+          .then((cache) => {
+            if (response.status === 200) {
+              cache.put(event.request, responseToCache);
+            }
+          })
+          .catch(() => {});
+          
+        return response;
+      })
+      .catch(() => {
+        // If network fetch fails, try to return from cache
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            return cachedResponse || Promise.reject('No cached content available');
+          });
+      })
+  );
 }); 
