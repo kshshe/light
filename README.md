@@ -24,8 +24,10 @@ Visit the live demo at: [https://light.sandgame.fyi](https://light.sandgame.fyi)
 
 - **Click**: Add a new light source
 - **C key**: Change the color of the main light source
-- **Mouse wheel**: Adjust light intensity
+- **Mouse wheel**: Change light intensity
 - **R key**: Release control of the main light source
+- **H key**: Hide/show all obstacles
+- **Space**: Add/move random light sources
 
 ## Installation
 
