@@ -1,23 +1,7 @@
 import { PRETTY_COLORS } from './constants.js';
+import { addEvent, addKeydownEvent } from './utils/event.js';
 
 export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
-  const addEvent = (events, callback) => {
-    events.forEach(event => {
-      window.addEventListener(event, (e) => {
-        try {
-          e.preventDefault();
-        } catch (error) {
-          console.error(error);
-        }
-
-        const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
-        const y = window.innerHeight - (e.clientY ?? e.touches?.[0]?.clientY ?? 0);
-
-        callback(x, y, e);
-      });
-    });
-  };
-
   let wasTouchClickStarted = false;
   let touchClickTimeout = null;
   const touchClickPosition = {
@@ -38,23 +22,21 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
     lightSource.intensity = Math.min(100, lightSource.intensity);
   });
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'r') {
-      state.isMovingSourceManually = false;
-    }
+  addKeydownEvent(['r', 'к'], () => {
+    state.isMovingSourceManually = false;
+  });
 
-    if (e.key === 'c') {
-      const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
-      const randomColor = PRETTY_COLORS[randomIndex];
-      lightSource.color.r = randomColor.r;
-      lightSource.color.g = randomColor.g;
-      lightSource.color.b = randomColor.b;
-      const sum = lightSource.color.r + lightSource.color.g + lightSource.color.b;
-      const increase = 3 / sum;
-      lightSource.color.r *= increase;
-      lightSource.color.g *= increase;
-      lightSource.color.b *= increase;
-    }
+  addKeydownEvent(['c', 'с'], () => {
+    const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
+    const randomColor = PRETTY_COLORS[randomIndex];
+    lightSource.color.r = randomColor.r;
+    lightSource.color.g = randomColor.g;
+    lightSource.color.b = randomColor.b;
+    const sum = lightSource.color.r + lightSource.color.g + lightSource.color.b;
+    const increase = 3 / sum;
+    lightSource.color.r *= increase;
+    lightSource.color.g *= increase;
+    lightSource.color.b *= increase;
   });
   
   addEvent(['click'], (x, y) => {
