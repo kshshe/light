@@ -103,6 +103,9 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
   addEvent(['mouseleave', 'mouseout', 'touchend', 'touchcancel'], () => {
     state.isMovingSourceManually = false;
     if (wasTouchClickStarted) {
+      if (sources.length >= MAX_SOURCES) {
+        return;
+      }
       sources.push({
         isVisible: true,
         position: { x: touchClickPosition.x, y: touchClickPosition.y },
