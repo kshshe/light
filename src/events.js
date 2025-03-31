@@ -22,6 +22,47 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     lightSource.intensity = Math.min(100, lightSource.intensity);
   });
 
+  const RANDOM_SOURCES_COUNT = 3;
+  const randomSources = [];
+  addKeydownEvent([' '], () => {
+    if (sources.length >= MAX_SOURCES) {
+      return;
+    }
+    
+    const availableSources = MAX_SOURCES - sources.length;
+    const randomSourcesCount = Math.min(availableSources, RANDOM_SOURCES_COUNT);
+    if (randomSources.length === 0) {
+      for (let i = 0; i < randomSourcesCount; i++) {
+        const newSource = {
+          isVisible: true,
+          position: {
+            ...lightSource.position,
+          },
+          targetPosition: {
+            ...lightSource.position,
+          },
+          intensity: 0,
+          color: {
+            ...lightSource.color,
+          },
+        }
+        randomSources.push(newSource);
+        sources.push(newSource);
+      }
+    }
+
+    randomSources.forEach(source => {
+      source.targetPosition.x = Math.random() * window.innerWidth;
+      source.targetPosition.y = Math.random() * window.innerHeight;
+      source.intensity = Math.round(Math.random() * 70 + 10);
+      source.isVisible = true;
+
+      source.color.r = Math.random();
+      source.color.g = Math.random();
+      source.color.b = Math.random();
+    });
+  });
+
   addKeydownEvent(['h', 'р'], () => {
     obstacles.forEach(obstacle => {
       obstacle.isVisible = !obstacle.isVisible;
@@ -54,6 +95,10 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     const newLightSource = {
       isVisible: true,
       position: {
+        x,
+        y,
+      },
+      targetPosition: {
         x,
         y,
       },
@@ -141,10 +186,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     const targetY = topY + 150 * Math.sin(Date.now() / 4000);
 
     if (!lightSource.targetPosition) {
-      lightSource.position = {
-        x: targetX,
-        y: targetY,
-      };
+      lightSource.position.x = targetX;
+      lightSource.position.y = targetY;
       lightSource.targetPosition = {
         x: targetX,
         y: targetY,
@@ -161,14 +204,16 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
   }, 10);
 
   setInterval(() => {
-    if (!lightSource.targetPosition) {
-      return;
+    for (const source of sources) {
+      if (!source.targetPosition) {
+        return;
+      }
+
+      const xDiff = source.targetPosition.x - source.position.x;
+      const yDiff = source.targetPosition.y - source.position.y;
+
+      source.position.x += xDiff / 10;
+      source.position.y += yDiff / 10;
     }
-
-    const xDiff = lightSource.targetPosition.x - lightSource.position.x;
-    const yDiff = lightSource.targetPosition.y - lightSource.position.y;
-
-    lightSource.position.x += xDiff / 10;
-    lightSource.position.y += yDiff / 10;
   }, 10);
 }; 
