@@ -160,7 +160,7 @@ const initEverything = () => {
     const averageTime = lastFramesTimes.length / (lastFramesTimes.reduce((a, b) => a + b, 0) / lastFramesTimes.length);
     if (averageTime) {
       const averageFps = 1000 / averageTime;
-      fpsElement.textContent = averageFps.toFixed(2);
+      fpsElement.textContent = Math.round(averageFps);
       fpsElement.style.display = 'inline';
       lastFramesTimes.length = 0;
     }
