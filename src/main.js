@@ -118,6 +118,15 @@ const initEverything = () => {
   const canvas = render.canvas;
   document.getElementsByTagName('body')[0].appendChild(canvas);
 
+  const isTouchOnly = window.matchMedia('(pointer: coarse)').matches;
+  if (!isTouchOnly) {
+    // Show the hint element for non-touch devices
+    const hintElement = document.getElementById('hint-element');
+    if (hintElement) {
+      hintElement.style.display = 'block';
+    }
+  }
+
   const randomInitialColor = PRETTY_COLORS[Math.floor(Math.random() * PRETTY_COLORS.length)];
   const lightSource = {
     isVisible: false,
@@ -162,7 +171,7 @@ const initEverything = () => {
   }
 
   draw();
-  
+
   // Initialize all event listeners
   initializeEvents(lightSource, sources, state, MAX_SOURCES);
 }
