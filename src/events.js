@@ -345,17 +345,17 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     
     if (lightSource.color.r !== 1) {
       const diff = 1 - lightSource.color.r;
-      lightSource.color.r += diff / 50;
+      lightSource.color.r += diff / 200;
     }
 
     if (lightSource.color.g !== 1) {
       const diff = 1 - lightSource.color.g;
-      lightSource.color.g += diff / 50;
+      lightSource.color.g += diff / 200;
     }
 
     if (lightSource.color.b !== 1) {
       const diff = 1 - lightSource.color.b;
-      lightSource.color.b += diff / 50;
+      lightSource.color.b += diff / 200;
     }
 
     const targetX = leftX + 150 * Math.cos(Date.now() / 4000);
