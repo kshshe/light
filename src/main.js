@@ -148,7 +148,7 @@ const initEverything = () => {
   const lastFramesTimes = [];
 
   setInterval(() => {
-    const averageTime = lastFramesTimes.length / (lastFramesTimes.reduce((a, b) => a + b, 0) / lastFramesTimes.length);
+    const averageTime = lastFramesTimes.reduce((a, b) => a + b, 0) / lastFramesTimes.length;
     if (averageTime) {
       const averageFps = 1000 / averageTime;
       fpsElement.textContent = Math.round(averageFps);
