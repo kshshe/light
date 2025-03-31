@@ -218,12 +218,23 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     }, 100);
   });
 
-  // --- Pinch Gesture Handling ---
+  // --- Pinch and Two Finger Tap Handling ---
+  let twoFingerTapStartTime = 0;
+  let isTwoFingerTap = false;
+  let twoFingerStartPositions = null;
+
   window.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
       e.preventDefault();
-      isPinching = true;
-      state.isMovingSourceManually = false;
+      wasTouchClickStarted = false;
+      twoFingerTapStartTime = Date.now();
+      isTwoFingerTap = true;
+      twoFingerStartPositions = [
+        { x: e.touches[0].clientX, y: e.touches[0].clientY },
+        { x: e.touches[1].clientX, y: e.touches[1].clientY }
+      ];
+      
+      // Initialize pinch values (will be used if the gesture becomes a pinch)
       previousPinchDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
@@ -232,31 +243,77 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
   }, { passive: false });
 
   window.addEventListener('touchmove', (e) => {
-    if (!isPinching || e.touches.length !== 2) return;
-
-    e.preventDefault();
-
-    const currentPinchDistance = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-
-    if (previousPinchDistance > 0) {
-      const scale = currentPinchDistance / previousPinchDistance;
-      lightSource.intensity *= scale;
-      lightSource.intensity = Math.max(0.1, Math.min(100, lightSource.intensity));
+    if (e.touches.length !== 2) return;
+    
+    // Check if the move is significant enough to be considered a pinch
+    if (twoFingerStartPositions && !isPinching) {
+      const moveThreshold = 10;
+      const dx1 = Math.abs(e.touches[0].clientX - twoFingerStartPositions[0].x);
+      const dy1 = Math.abs(e.touches[0].clientY - twoFingerStartPositions[0].y);
+      const dx2 = Math.abs(e.touches[1].clientX - twoFingerStartPositions[1].x);
+      const dy2 = Math.abs(e.touches[1].clientY - twoFingerStartPositions[1].y);
+      
+      if (dx1 > moveThreshold || dy1 > moveThreshold || dx2 > moveThreshold || dy2 > moveThreshold) {
+        // This is a significant movement, so not a tap
+        isTwoFingerTap = false;
+        
+        // If the distance between fingers is changing, consider it a pinch
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        
+        const distanceDelta = Math.abs(currentDistance - previousPinchDistance);
+        if (distanceDelta > 5) {
+          isPinching = true;
+          state.isMovingSourceManually = false;
+        }
+      }
     }
+    
+    // Handle pinching
+    if (isPinching) {
+      e.preventDefault();
+      
+      const currentPinchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
 
-    previousPinchDistance = currentPinchDistance;
+      if (previousPinchDistance > 0) {
+        const scale = currentPinchDistance / previousPinchDistance;
+        lightSource.intensity *= scale;
+        lightSource.intensity = Math.max(0.1, Math.min(100, lightSource.intensity));
+      }
+
+      previousPinchDistance = currentPinchDistance;
+    }
   }, { passive: false });
 
   window.addEventListener('touchend', (e) => {
+    // Handle two finger tap if it wasn't a pinch
+    if (isTwoFingerTap && !isPinching && Date.now() - twoFingerTapStartTime < 300) {
+      // Change color (same logic as the 'c' key press)
+      const randomIndex = Math.floor(Math.random() * PRETTY_COLORS.length);
+      const randomColor = PRETTY_COLORS[randomIndex];
+      lightSource.color.r = randomColor.r;
+      lightSource.color.g = randomColor.g;
+      lightSource.color.b = randomColor.b;
+      const sum = lightSource.color.r + lightSource.color.g + lightSource.color.b;
+      const increase = 3 / sum;
+      lightSource.color.r *= increase;
+      lightSource.color.g *= increase;
+      lightSource.color.b *= increase;
+      
+      // Provide haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    }
+    
+    // Handle pinch ending
     if (isPinching && e.touches.length < 2) {
       isPinching = false;
-      wasTouchClickStarted = false;
-      if (longPressTimeout) clearTimeout(longPressTimeout);
-      isLongPressing = false;
-      previousPinchDistance = 0;
       if (e.touches.length === 1) {
          state.isMovingSourceManually = true;
          lightSource.isVisible = true;
@@ -266,8 +323,16 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
          };
       }
     }
+    
+    // Reset state if all fingers are lifted
+    if (e.touches.length === 0) {
+      isTwoFingerTap = false;
+      isPinching = false;
+      twoFingerStartPositions = null;
+      previousPinchDistance = 0;
+    }
   });
-  // --- End Pinch Gesture Handling ---
+  // --- End of Pinch and Two Finger Tap Handling ---
 
   // Initialize animation intervals
   setInterval(() => {
