@@ -40,7 +40,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
     }
 
     lightSource.intensity = Math.max(0.1, lightSource.intensity);
-    lightSource.intensity = Math.min(100, lightSource.intensity);
+    lightSource.intensity = Math.min(200, lightSource.intensity);
   });
 
   window.addEventListener('keydown', (e) => {
@@ -171,8 +171,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES) => {
     lightSource.targetPosition.x = targetX;
     lightSource.targetPosition.y = targetY;
     lightSource.isVisible = true;
-    if (lightSource.intensity !== 20) {
-      const diff = 20 - lightSource.intensity;
+    if (lightSource.intensity !== 40) {
+      const diff = 40 - lightSource.intensity;
       lightSource.intensity += diff / 50;
     }
   }, 10);
