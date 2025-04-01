@@ -46,7 +46,7 @@ const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource
 
   randomSources.forEach(source => {
     let targetIntensity = getRandomIntensity();
-    const direction = getRandomDirection();
+    let direction = getRandomDirection();
     source.targetPosition.x = Math.random() * window.innerWidth;
     source.targetPosition.y = Math.random() * window.innerHeight;
     source.intensity = targetIntensity;
