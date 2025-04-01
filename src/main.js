@@ -167,6 +167,22 @@ const initEverything = () => {
     shownHintElement = desktopHints;
   }
 
+  const aboutLink = document.querySelector('.about-link');
+  const aboutModal = document.querySelector('.about-modal');
+  aboutLink.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    aboutModal.classList.toggle('hidden');
+  });
+
+  aboutModal.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (e.target === aboutModal) {
+      e.preventDefault();
+      aboutModal.classList.add('hidden');
+    }
+  })
+
   const fpsElement = document.getElementById('fps');
   const lastFramesTimes = [];
 
