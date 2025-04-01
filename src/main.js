@@ -96,10 +96,17 @@ const initEverything = () => {
 
       const distanceSquared = (x - sourceX) ** 2 + (y - sourceY) ** 2;
       const distance = Math.sqrt(distanceSquared);
-      if (distance < sourceIntensity && debugMode === 1) {
-        debugColorR = sourceColorR;
-        debugColorG = sourceColorG;
-        debugColorB = sourceColorB;
+      if (debugMode === 1) {
+        if (distance < sourceIntensity && debugMode === 1) {
+          debugColorR = sourceColorR;
+          debugColorG = sourceColorG;
+          debugColorB = sourceColorB;
+        }
+        if (Math.abs(distance - sourceIntensity) < 1) {
+          debugColorR = 1;
+          debugColorG = 0;
+          debugColorB = 0;
+        }
       }
       const intensity = sourceIntensity / distance;
 
