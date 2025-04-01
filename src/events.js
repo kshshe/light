@@ -1,8 +1,18 @@
 import { PRETTY_COLORS } from './constants.js';
 import { addEvent, addKeydownEvent } from './utils/event.js';
+import { getRandomDirection } from './utils/getRandomDirection.js';
 
 const RANDOM_SOURCES_COUNT = 3;
 
+const isSmallScreen = window.innerWidth < 768;
+const intensityVariation = isSmallScreen ? 15 : 25;
+const getRandomIntensity = () => {
+  return Math.round(Math.random() * intensityVariation + 8);
+}
+
+const getRandomColor = () => 0.5 + Math.random() * 0.5;
+
+const intervals = [];
 const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource) => {
   if (sources.length >= MAX_SOURCES) {
     return;
@@ -30,15 +40,94 @@ const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource
     }
   }
 
+  for (const interval of intervals) {
+    clearInterval(interval);
+  }
+
   randomSources.forEach(source => {
+    let targetIntensity = getRandomIntensity();
+    const direction = getRandomDirection();
     source.targetPosition.x = Math.random() * window.innerWidth;
     source.targetPosition.y = Math.random() * window.innerHeight;
-    source.intensity = Math.round(Math.random() * 70 + 10);
+    source.intensity = targetIntensity;
     source.isVisible = true;
 
-    source.color.r = Math.random();
-    source.color.g = Math.random();
-    source.color.b = Math.random();
+    let targetR = getRandomColor();
+    let targetG = getRandomColor();
+    let targetB = getRandomColor();
+
+    source.color.r = targetR;
+    source.color.g = targetG;
+    source.color.b = targetB;
+
+    const speed = 1;
+
+    const interval = setInterval(() => {
+      if (source.intensity < targetIntensity) {
+        source.intensity += 0.01;
+      }
+
+      if (source.color.r !== targetR) {
+        source.color.r += (targetR - source.color.r) / 100;
+      }
+
+      if (source.color.g !== targetG) {
+        source.color.g += (targetG - source.color.g) / 100;
+      }
+
+      if (source.color.b !== targetB) {
+        source.color.b += (targetB - source.color.b) / 100;
+      }
+
+      if (Math.random() > 0.995) {
+        const newIntensity = getRandomIntensity();
+        console.log(`changing intensity from ${targetIntensity} to ${newIntensity}`);
+        targetIntensity = newIntensity;
+      }
+
+      if (Math.random() > 0.995) {
+        const newR = getRandomColor();
+        const newG = getRandomColor();
+        const newB = getRandomColor();
+        console.log(`changing color from rgb(${source.color.r.toFixed(2)}, ${source.color.g.toFixed(2)}, ${source.color.b.toFixed(2)}) to rgb(${newR.toFixed(2)}, ${newG.toFixed(2)}, ${newB.toFixed(2)})`);
+        targetR = newR;
+        targetG = newG;
+        targetB = newB;
+      }
+
+      let nextX = source.targetPosition.x + direction.x * speed;
+      let nextY = source.targetPosition.y + direction.y * speed;
+
+      const revertX = () => {
+        direction.x = -direction.x;
+        nextX = source.targetPosition.x + direction.x * 1;
+      }
+
+      const revertY = () => {
+        direction.y = -direction.y;
+        nextY = source.targetPosition.y + direction.y * 1;
+      }
+
+      if (nextX < 0 || nextX > window.innerWidth) {
+        revertX();
+      }
+      if (nextY < 0 || nextY > window.innerHeight) {
+        revertY();
+      }
+
+      source.targetPosition = {
+        x: nextX,
+        y: nextY,
+      }
+
+      const shouldChangeDirection = Math.random() > 0.9999;
+      if (shouldChangeDirection) {
+        console.log(`changing direction from ${direction.x} ${direction.y} to ${newDirection.x} ${newDirection.y}`);
+        direction = newDirection;
+      }
+    }, 16)
+
+    intervals.push(interval);
   });
 };
 
@@ -98,7 +187,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     lightSource.color.g *= increase;
     lightSource.color.b *= increase;
   });
-  
+
   addEvent(['click'], (x, y, e) => {
     if (isPinching) return;
     wasTouchClickStarted = false;
@@ -233,7 +322,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
         { x: e.touches[0].clientX, y: e.touches[0].clientY },
         { x: e.touches[1].clientX, y: e.touches[1].clientY }
       ];
-      
+
       // Initialize pinch values (will be used if the gesture becomes a pinch)
       previousPinchDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
@@ -244,7 +333,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
 
   window.addEventListener('touchmove', (e) => {
     if (e.touches.length !== 2) return;
-    
+
     // Check if the move is significant enough to be considered a pinch
     if (twoFingerStartPositions && !isPinching) {
       const moveThreshold = 10;
@@ -252,17 +341,17 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       const dy1 = Math.abs(e.touches[0].clientY - twoFingerStartPositions[0].y);
       const dx2 = Math.abs(e.touches[1].clientX - twoFingerStartPositions[1].x);
       const dy2 = Math.abs(e.touches[1].clientY - twoFingerStartPositions[1].y);
-      
+
       if (dx1 > moveThreshold || dy1 > moveThreshold || dx2 > moveThreshold || dy2 > moveThreshold) {
         // This is a significant movement, so not a tap
         isTwoFingerTap = false;
-        
+
         // If the distance between fingers is changing, consider it a pinch
         const currentDistance = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        
+
         const distanceDelta = Math.abs(currentDistance - previousPinchDistance);
         if (distanceDelta > 5) {
           isPinching = true;
@@ -270,11 +359,11 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
         }
       }
     }
-    
+
     // Handle pinching
     if (isPinching) {
       e.preventDefault();
-      
+
       const currentPinchDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
@@ -304,26 +393,26 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       lightSource.color.r *= increase;
       lightSource.color.g *= increase;
       lightSource.color.b *= increase;
-      
+
       // Provide haptic feedback
       if (navigator.vibrate) {
         navigator.vibrate(10);
       }
     }
-    
+
     // Handle pinch ending
     if (isPinching && e.touches.length < 2) {
       isPinching = false;
       if (e.touches.length === 1) {
-         state.isMovingSourceManually = true;
-         lightSource.isVisible = true;
-         lightSource.targetPosition = {
-           x: e.touches[0].clientX,
-           y: window.innerHeight - e.touches[0].clientY,
-         };
+        state.isMovingSourceManually = true;
+        lightSource.isVisible = true;
+        lightSource.targetPosition = {
+          x: e.touches[0].clientX,
+          y: window.innerHeight - e.touches[0].clientY,
+        };
       }
     }
-    
+
     // Reset state if all fingers are lifted
     if (e.touches.length === 0) {
       isTwoFingerTap = false;
@@ -342,7 +431,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
 
     const leftX = window.innerWidth / 2;
     const topY = window.innerHeight / 2;
-    
+
     if (lightSource.color.r !== 1) {
       const diff = 1 - lightSource.color.r;
       lightSource.color.r += diff / 200;
@@ -369,7 +458,7 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
         y: targetY,
       };
     }
-    
+
     lightSource.targetPosition.x = targetX;
     lightSource.targetPosition.y = targetY;
     lightSource.isVisible = true;
