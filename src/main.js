@@ -1,5 +1,5 @@
 import { inject } from "@vercel/analytics"
-import { MAX_SOURCES, MAX_OBSTACLES } from './constants.js'
+import { MAX_SOURCES, MAX_OBSTACLES, MIN_VISIBLE_INTENSITY, MIN_OPACITY_THRESHOLD } from './constants.js'
 import { initializeEvents } from './events.js'
 import { flattenSources } from './utils/flattenSources.js'
 import { flattenObstacles } from './utils/flattenObstacles.js'
@@ -39,6 +39,17 @@ const initEverything = () => {
     return 0;
   }
 
+  function isBetween(from, to, value) {
+    const smallest = Math.min(from, to);
+    const largest = Math.max(from, to);
+
+    if (value >= smallest && value <= largest) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
   function intersect(aX, aY, bX, bY, cX, cY, dX, dY) {
     const ACDResult = ccw(aX, aY, cX, cY, dX, dY);
     const BCDResult = ccw(bX, bY, cX, cY, dX, dY);
@@ -67,33 +78,47 @@ const initEverything = () => {
       const sourceX = sources[startIndex];
       const sourceY = sources[startIndex + 1];
       const sourceIntensity = sources[startIndex + 2];
+      
+      if (sourceIntensity <= 0) continue;
+      
       const sourceColorR = sources[startIndex + 3];
       const sourceColorG = sources[startIndex + 4];
       const sourceColorB = sources[startIndex + 5];
 
-      if (sourceIntensity > 0) {
-        const distance = Math.sqrt((x - sourceX) ** 2 + (y - sourceY) ** 2);
-        const intensity = sourceIntensity / distance;
+      const distanceSquared = (x - sourceX) ** 2 + (y - sourceY) ** 2;
+      const intensity = sourceIntensity / Math.sqrt(distanceSquared);
 
-        let opacitiesResult = 1;
-        for (let j = 0; j < this.constants.obstaclesCount; j++) {
-          const obstacleStartX = obstacles[j * 5];
-          const obstacleStartY = obstacles[j * 5 + 1];
-          const obstacleEndX = obstacles[j * 5 + 2];
-          const obstacleEndY = obstacles[j * 5 + 3];
-          const obstacleOpacity = obstacles[j * 5 + 4];
+      if (intensity < this.constants.minVisibleIntensity) continue;
 
-          if (obstacleEndX !== obstacleStartX || obstacleEndY !== obstacleStartY) {
-            if (intersect(sourceX, sourceY, x, y, obstacleStartX, obstacleStartY, obstacleEndX, obstacleEndY) === 0) {
-              opacitiesResult *= obstacleOpacity;
-            }
-          }
+      let opacitiesResult = 1;
+      for (let j = 0; j < this.constants.obstaclesCount; j++) {
+        const obstacleStartX = obstacles[j * 5];
+        const obstacleStartY = obstacles[j * 5 + 1];
+        const obstacleEndX = obstacles[j * 5 + 2];
+        const obstacleEndY = obstacles[j * 5 + 3];
+        
+        if (obstacleEndX === obstacleStartX && obstacleEndY === obstacleStartY) continue;
+
+        const isXBetween = isBetween(x, sourceX, obstacleEndX) === 1 || isBetween(x, sourceX, obstacleStartX) === 1;
+        const isYBetween = isBetween(y, sourceY, obstacleEndY) === 1 || isBetween(y, sourceY, obstacleStartY) === 1  ;
+
+        if (!isXBetween && !isYBetween) continue;
+        
+        const obstacleOpacity = obstacles[j * 5 + 4];
+        
+        if (obstacleOpacity >= 1) continue;
+
+        if (opacitiesResult < this.constants.minOpacityThreshold) break;
+        
+        if (intersect(sourceX, sourceY, x, y, obstacleStartX, obstacleStartY, obstacleEndX, obstacleEndY) === 0) {
+          opacitiesResult *= obstacleOpacity;
         }
-
-        sumOfIntensitiesR += intensity * opacitiesResult * sourceColorR;
-        sumOfIntensitiesG += intensity * opacitiesResult * sourceColorG;
-        sumOfIntensitiesB += intensity * opacitiesResult * sourceColorB;
       }
+
+      const finalIntensity = intensity * opacitiesResult;
+      sumOfIntensitiesR += finalIntensity * sourceColorR;
+      sumOfIntensitiesG += finalIntensity * sourceColorG;
+      sumOfIntensitiesB += finalIntensity * sourceColorB;
     }
 
     this.color(sumOfIntensitiesR, sumOfIntensitiesG, sumOfIntensitiesB);
@@ -101,11 +126,20 @@ const initEverything = () => {
     constants: {
       sourcesCount: MAX_SOURCES,
       obstaclesCount: MAX_OBSTACLES,
+      minVisibleIntensity: MIN_VISIBLE_INTENSITY,
+      minOpacityThreshold: MIN_OPACITY_THRESHOLD,
     }
   })
     .setDynamicOutput(true)
     .setOutput([window.innerWidth, window.innerHeight])
     .setGraphical(true)
+    .addFunction(isBetween, {
+      argumentTypes: {
+        from: 'Number',
+        to: 'Number',
+        value: 'Number',
+      }, returnType: 'Number'
+    })
     .addFunction(ccw, {
       argumentTypes: {
         aX: 'Number',
