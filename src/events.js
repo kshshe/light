@@ -131,7 +131,7 @@ const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource
   });
 };
 
-export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obstacles) => {
+export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obstacles, fixCanvasSize = () => {}) => {
   let wasTouchClickStarted = false;
   let touchClickTimeout = null;
   let longPressTimeout = null;
@@ -299,11 +299,33 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
     }
   });
 
+  addKeydownEvent(['f', 'а'], () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+      setTimeout(fixCanvasSize, 100);
+    }
+  });
+
+  let fixCanvasTimeout;
   let reloadTimeout;
+  let prevWidth = 0;
+  let prevHeight = 0;
   window.addEventListener('resize', () => {
-    clearTimeout(reloadTimeout);
-    reloadTimeout = setTimeout(() => {
-      window.location.reload();
+    if (prevWidth > window.innerWidth || prevHeight > window.innerHeight) {
+      clearTimeout(reloadTimeout);
+      reloadTimeout = setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      return;
+    }
+
+    clearTimeout(fixCanvasTimeout);
+    fixCanvasTimeout = setTimeout(() => {
+      fixCanvasSize();
+      prevWidth = window.innerWidth;
+      prevHeight = window.innerHeight;
     }, 100);
   });
 

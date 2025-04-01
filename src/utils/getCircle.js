@@ -1,16 +1,21 @@
 import { MAX_OBSTACLES } from "../constants";
+import { addEvent } from "./event";
 
 const CIRCLE_SEGMENTS = 6;
 
 export const getCircle = (options) => {
-  const leftX = options.x;
-  const rightX = options.x + options.width;
-  const topY = options.y;
-  const bottomY = options.y + options.height;
+  let centerX = window.innerWidth / 2;
+  let centerY = window.innerHeight / 2;
 
-  const centerX = (leftX + rightX) / 2;
-  const centerY = (topY + bottomY) / 2;
-  const radius = Math.sqrt((rightX - leftX) ** 2 + (bottomY - topY) ** 2) / 2;
+  const rightX = centerX + options.radius;
+  const bottomY = centerY + options.radius;
+
+  const radius = options.radius;
+
+  addEvent(['resize'], () => {
+    centerX = window.innerWidth / 2;
+    centerY = window.innerHeight / 2;
+  });
   
   const points = [];
 

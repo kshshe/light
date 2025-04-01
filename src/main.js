@@ -103,6 +103,7 @@ const initEverything = () => {
       obstaclesCount: MAX_OBSTACLES,
     }
   })
+    .setDynamicOutput(true)
     .setOutput([window.innerWidth, window.innerHeight])
     .setGraphical(true)
     .addFunction(ccw, {
@@ -149,10 +150,7 @@ const initEverything = () => {
 
   const obstacles = [
     ...getCircle({
-      x: window.innerWidth / 2 - 50,
-      y: window.innerHeight / 2 - 50,
-      width: 100,
-      height: 100,
+      radius: 75,
     }),
   ]
   
@@ -230,8 +228,14 @@ const initEverything = () => {
 
   console.log(obstacles);
 
+  const fixCanvasSize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    render.setOutput([window.innerWidth, window.innerHeight]);
+  }
+
   // Initialize all event listeners
-  initializeEvents(lightSource, sources, state, MAX_SOURCES, obstacles);
+  initializeEvents(lightSource, sources, state, MAX_SOURCES, obstacles, fixCanvasSize);
 
   draw();
 }
