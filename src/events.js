@@ -122,6 +122,7 @@ const addOrMoveRandomSources = (sources, MAX_SOURCES, randomSources, lightSource
 
       const shouldChangeDirection = Math.random() > 0.9999;
       if (shouldChangeDirection) {
+        const newDirection = getRandomDirection();
         console.log(`changing direction from ${direction.x} ${direction.y} to ${newDirection.x} ${newDirection.y}`);
         direction = newDirection;
       }
