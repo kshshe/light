@@ -7,9 +7,6 @@ export const getCircle = (options) => {
   let centerX = window.innerWidth / 2;
   let centerY = window.innerHeight / 2;
 
-  const rightX = centerX + options.radius;
-  const bottomY = centerY + options.radius;
-
   const radius = options.radius;
 
   addEvent(['resize'], () => {
@@ -32,7 +29,7 @@ export const getCircle = (options) => {
         startY: previousY,
         endX: x,
         endY: y,
-        opacity: 0.4,
+        opacity: 0,
         isVisible: true,
       });
     }

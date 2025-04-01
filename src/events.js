@@ -506,4 +506,8 @@ export const initializeEvents = (lightSource, sources, state, MAX_SOURCES, obsta
       source.position.y += yDiff / 10;
     }
   }, 10);
+
+  addKeydownEvent(['d', 'в'], () => {
+    state.debugMode = !state.debugMode;
+  });
 }; 

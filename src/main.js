@@ -50,7 +50,7 @@ const initEverything = () => {
     if (value >= smallest && value <= largest) {
       return 1;
     }
-    
+
     return 0;
   }
 
@@ -73,6 +73,11 @@ const initEverything = () => {
     const x = this.thread.x;
     const y = this.thread.y;
 
+    let debugColorR = 0;
+    let debugColorG = 0;
+    let debugColorB = 0;
+    let stepsProcessed = 0;
+
     let sumOfIntensitiesR = 0;
     let sumOfIntensitiesG = 0;
     let sumOfIntensitiesB = 0;
@@ -82,17 +87,25 @@ const initEverything = () => {
       const sourceX = sources[startIndex];
       const sourceY = sources[startIndex + 1];
       const sourceIntensity = sources[startIndex + 2];
-      
+
       if (sourceIntensity <= 0) continue;
-      
+
       const sourceColorR = sources[startIndex + 3];
       const sourceColorG = sources[startIndex + 4];
       const sourceColorB = sources[startIndex + 5];
 
       const distanceSquared = (x - sourceX) ** 2 + (y - sourceY) ** 2;
-      const intensity = sourceIntensity / Math.sqrt(distanceSquared);
+      const distance = Math.sqrt(distanceSquared);
+      if (distance < sourceIntensity && debugMode === 1) {
+        debugColorR = sourceColorR;
+        debugColorG = sourceColorG;
+        debugColorB = sourceColorB;
+      }
+      const intensity = sourceIntensity / distance;
 
       if (intensity < this.constants.minVisibleIntensity) continue;
+
+      stepsProcessed++;
 
       let opacitiesResult = 1;
       for (let j = 0; j < this.constants.obstaclesCount; j++) {
@@ -100,20 +113,31 @@ const initEverything = () => {
         const obstacleStartY = obstacles[j * 5 + 1];
         const obstacleEndX = obstacles[j * 5 + 2];
         const obstacleEndY = obstacles[j * 5 + 3];
-        
+
+        if (debugMode === 1) {
+          if (Math.abs(x - obstacleStartX) < 3 && Math.abs(y - obstacleStartY) < 3) {
+            debugColorB = 1;
+          }
+
+          if (Math.abs(x - obstacleEndX) < 3 && Math.abs(y - obstacleEndY) < 3) {
+            debugColorB = 1;
+          }
+        }
+
         if (obstacleEndX === obstacleStartX && obstacleEndY === obstacleStartY) continue;
 
         const isXBetween = isBetween(x, sourceX, obstacleEndX) === 1 || isBetween(x, sourceX, obstacleStartX) === 1;
-        const isYBetween = isBetween(y, sourceY, obstacleEndY) === 1 || isBetween(y, sourceY, obstacleStartY) === 1  ;
+        const isYBetween = isBetween(y, sourceY, obstacleEndY) === 1 || isBetween(y, sourceY, obstacleStartY) === 1;
 
         if (!isXBetween && !isYBetween) continue;
-        
+
         const obstacleOpacity = obstacles[j * 5 + 4];
-        
+
         if (obstacleOpacity >= 1) continue;
 
         if (opacitiesResult < this.constants.minOpacityThreshold) break;
-        
+
+        stepsProcessed++;
         if (intersect(sourceX, sourceY, x, y, obstacleStartX, obstacleStartY, obstacleEndX, obstacleEndY) === 0) {
           opacitiesResult *= obstacleOpacity;
         }
@@ -125,7 +149,16 @@ const initEverything = () => {
       sumOfIntensitiesB += finalIntensity * sourceColorB;
     }
 
-    this.color(sumOfIntensitiesR, sumOfIntensitiesG, sumOfIntensitiesB);
+    if (debugMode !== 1) {
+      this.color(sumOfIntensitiesR, sumOfIntensitiesG, sumOfIntensitiesB);
+    } else {
+      if (debugColorB === 0 && debugColorG === 0 && debugColorR === 0) {
+        const intensity = stepsProcessed / 50;
+        this.color(intensity, intensity, intensity);
+      } else {
+        this.color(debugColorR, debugColorG, debugColorB);
+      }
+    }
   }, {
     constants: {
       sourcesCount: MAX_SOURCES,
@@ -191,7 +224,7 @@ const initEverything = () => {
       radius: 75,
     }),
   ]
-  
+
   const desktopHints = document.querySelector('.desktop-hints');
   const mobileHints = document.querySelector('.mobile-hints');
   let shownHintElement = null;
@@ -288,7 +321,7 @@ const initEverything = () => {
     endX: hintRightX + hintPadding,
     endY: window.innerHeight - hintTopY + hintPadding,
   }
-  
+
   obstacles.push(topBorder, rightBorder);
 
   console.log(obstacles);
