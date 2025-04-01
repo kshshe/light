@@ -94,10 +94,13 @@ const initEverything = () => {
       const sourceColorG = sources[startIndex + 4];
       const sourceColorB = sources[startIndex + 5];
 
+      let isSource = 0;
+
       const distanceSquared = (x - sourceX) ** 2 + (y - sourceY) ** 2;
       const distance = Math.sqrt(distanceSquared);
       if (debugMode === 1) {
         if (distance < sourceIntensity && debugMode === 1) {
+          isSource = 1;
           debugColorR = sourceColorR;
           debugColorG = sourceColorG;
           debugColorB = sourceColorB;
@@ -152,6 +155,15 @@ const initEverything = () => {
       sumOfIntensitiesR += finalIntensity * sourceColorR;
       sumOfIntensitiesG += finalIntensity * sourceColorG;
       sumOfIntensitiesB += finalIntensity * sourceColorB;
+
+      if (sumOfIntensitiesR > 0.99 && sumOfIntensitiesG > 0.99 && sumOfIntensitiesB > 0.99) {
+        if (isSource === 0 && debugMode === 1) {
+          debugColorG = 1 / stepsProcessed;
+          debugColorB = 0;
+          debugColorR = 0;
+        }
+        break;
+      }
     }
 
     if (debugMode !== 1) {
