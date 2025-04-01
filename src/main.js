@@ -43,7 +43,7 @@ const initEverything = () => {
   function isBetween(from, to, value) {
     const smallest = Math.min(from, to);
     const largest = Math.max(from, to);
-    if (largest - smallest < 100) {
+    if (Math.abs(largest - value) < 100 && Math.abs(smallest - value) < 100) {
       return 1;
     }
 
