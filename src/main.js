@@ -106,6 +106,7 @@ const initEverything = () => {
           debugColorB = sourceColorB;
         }
         if (Math.abs(distance - sourceIntensity) < 1) {
+          isSource = 1;
           debugColorR = 1;
           debugColorG = 0;
           debugColorB = 0;
