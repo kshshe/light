@@ -105,8 +105,6 @@ const initEverything = () => {
 
       if (intensity < this.constants.minVisibleIntensity) continue;
 
-      stepsProcessed++;
-
       let opacitiesResult = 1;
       for (let j = 0; j < this.constants.obstaclesCount; j++) {
         const obstacleStartX = obstacles[j * 5];
