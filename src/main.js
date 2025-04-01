@@ -24,6 +24,7 @@ const initEverything = () => {
 
   const state = {
     isMovingSourceManually: false,
+    debugMode: false,
   }
 
   const GpuConstructor = GPU.GPU ?? GPU;
@@ -42,6 +43,9 @@ const initEverything = () => {
   function isBetween(from, to, value) {
     const smallest = Math.min(from, to);
     const largest = Math.max(from, to);
+    if (largest - smallest < 100) {
+      return 1;
+    }
 
     if (value >= smallest && value <= largest) {
       return 1;
@@ -65,7 +69,7 @@ const initEverything = () => {
   }
 
   const gpu = new GpuConstructor();
-  const render = gpu.createKernel(function (sources, obstacles) {
+  const render = gpu.createKernel(function (sources, obstacles, debugMode) {
     const x = this.thread.x;
     const y = this.thread.y;
 
@@ -230,6 +234,7 @@ const initEverything = () => {
     }
   }, 1000);
 
+  let lastJSON = null;
   let lastFrameTime = performance.now();
   function processFrame() {
     const currentTime = performance.now();
@@ -243,7 +248,17 @@ const initEverything = () => {
     const input = flattenSources(filteredSources);
     const obstaclesInput = flattenObstacles(filteredObstacles);
 
-    render(input, obstaclesInput);
+    const json = JSON.stringify({
+      sources: input,
+      obstacles: obstaclesInput,
+      debugMode: state.debugMode,
+    });
+
+    if (json !== lastJSON) {
+      lastJSON = json;
+      render(input, obstaclesInput, state.debugMode ? 1 : 0);
+    }
+
 
     requestAnimationFrame(processFrame);
   }
