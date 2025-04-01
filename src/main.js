@@ -69,9 +69,14 @@ const initEverything = () => {
   }
 
   const gpu = new GpuConstructor();
-  const render = gpu.createKernel(function (sources, obstacles, debugMode) {
+  const render = gpu.createKernel(function (sources, obstacles, debug) {
     const x = this.thread.x;
     const y = this.thread.y;
+
+    let debugMode = 0;
+    if (debug === 1 && (x % 20 !== 0) && (y % 20 !== 0)) {
+      debugMode = 1;
+    }
 
     let debugColorR = 0;
     let debugColorG = 0;
