@@ -29,7 +29,7 @@ export const getCircle = (options) => {
         startY: previousY,
         endX: x,
         endY: y,
-        opacity: 0.3,
+        opacity: 0.5,
         isVisible: true,
       });
     }
