@@ -1,4 +1,4 @@
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Flight.sandgame.fyi)](https://light.sandgame.fyi)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Flight..a-laud.ru)](https://light..a-laud.ru)
 
 # Light
 
@@ -14,7 +14,7 @@ A GPU-accelerated light simulation web application that renders dynamic light so
 
 ## Demo
 
-Visit the live demo at: [https://light.sandgame.fyi](https://light.sandgame.fyi)
+Visit the live demo at: [https://light..a-laud.ru](https://light.a-laud.ru)
 
 ## Screenshot
 
