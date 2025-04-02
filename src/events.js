@@ -2,7 +2,7 @@ import { PRETTY_COLORS } from './constants.js';
 import { addEvent, addKeydownEvent } from './utils/event.js';
 import { getRandomDirection } from './utils/getRandomDirection.js';
 
-const RANDOM_SOURCES_COUNT = 3;
+const RANDOM_SOURCES_COUNT = 5;
 
 const isSmallScreen = window.innerWidth < 768;
 const intensityVariation = isSmallScreen ? 15 : 25;
